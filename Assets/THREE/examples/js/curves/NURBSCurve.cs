@@ -16,8 +16,8 @@ namespace THREE {
 
 	public class NURBSCurve : Curve {
 
-		int degree = degree;
-		float[] knots = knots;
+		int degree;
+		float[] knots;
 		Vector4[] controlPoints;
 
 		public NURBSCurve(int degree, float[] knots /* array of reals */, Vector4[] controlPoints /* array of Vector(2|3|4) */ ){
@@ -53,7 +53,7 @@ namespace THREE {
 		{
 			float u = this.knots[0] + t * (this.knots[this.knots.Length - 1] - this.knots[0]);
 			Vector4[] ders = THREE.NURBSUtils.calcNURBSDerivatives(this.degree, this.knots, this.controlPoints, u, 1);
-			//Vector3 tangent = ders[1].clone();
+			
 			Vector3 tangent = ders[1];
 			tangent.Normalize();
 			

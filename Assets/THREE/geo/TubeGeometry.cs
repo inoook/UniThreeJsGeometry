@@ -21,7 +21,7 @@ namespace THREE
 	{
 
 		public List<Vector3> tangents;
-		public List<Vector3> normals;
+//		public List<Vector3> normals;
 		public List<Vector3> binormals;
 		//private Curve path;
 
@@ -122,12 +122,14 @@ namespace THREE
 					uvb = new Vector2( (float)( i + 1 ) / segments, (float)j / radialSegments );
 					uvc = new Vector2( (float)( i + 1 ) / segments, (float)( j + 1 ) / radialSegments );
 					uvd = new Vector2( (float)i / segments, (float)( j + 1 ) / radialSegments );
+
+					Face3 face0 = new Face3 (a, b, d);
+					face0.uvs = new Vector2[]{ uva, uvb, uvd };
+					this.faces.Add( face0 );
 					
-					this.faces.Add( new Face3( a, b, d ) );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uva, uvb, uvd }) );
-					
-					this.faces.Add( new Face3( b, c, d ) );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uvb, uvc, uvd }));
+					Face3 face1 = new Face3 (b, c, d);
+					face1.uvs = new Vector2[]{ uvb, uvc, uvd };
+					this.faces.Add( face1 );
 					
 				}
 			}
@@ -156,8 +158,7 @@ namespace THREE
 				//Vector3 tangent = new Vector3 ();
 				Vector3 normal = new Vector3 ();
 				//Vector3 binormal = new Vector3 ();
-			
-			
+				
 				Vector3 vec = new Vector3 ();
 				//Matrix4x4 mat = new Matrix4x4 ();
 			
@@ -174,13 +175,15 @@ namespace THREE
 				List<Vector3> normals = new List<Vector3> (new Vector3[numpoints]);
 				List<Vector3> binormals = new List<Vector3> (new Vector3[numpoints]);
 			
+                Debug.LogWarning("FrenetFrames: "+numpoints + " / "+path);
+				//vecs = new List<Vector3>(new Vector3[numpoints]);
+
 				// expose internals
 				this.tangents = tangents;
 				this.normals = normals;
 				this.binormals = binormals;
 			
 				// compute the tangent vectors for each segment on the path
-			
 				for (int i = 0; i < numpoints; i++) {
 				
 					u = (float)i / (numpoints - 1);
@@ -191,7 +194,6 @@ namespace THREE
 					t_vec.Normalize();
 					//tangents.Add( t_vec );
 					tangents[i] = ( t_vec );
-				
 				}
 			
 				//initialNormal3();
@@ -221,7 +223,9 @@ namespace THREE
 				if (tz <= smallest) {
 					normal = new Vector3 (0, 0, 1);
 				}
+
 				vec = Vector3.Cross (tangents [0], normal).normalized;
+
 				//vec.crossVectors( tangents[ 0 ], normal ).normalize();
 				
 				//		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
@@ -239,12 +243,9 @@ namespace THREE
 				// js233
 				for (int i = 1; i < numpoints; i++) {
 				
-//					normals.Add( clone (normals [i - 1]) );
-//					binormals.Add( clone (binormals [i - 1]) );
 					normals[i] = clone( normals [i - 1]);
 					binormals[i] = clone(binormals [i - 1]);
 				
-					//vec.crossVectors( tangents[ i-1 ], tangents[ i ] );
 					vec = Vector3.Cross (tangents [i - 1], tangents [i]);
 				
 					if (vec.magnitude > epsilon) {
@@ -258,18 +259,18 @@ namespace THREE
 						//normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 						Quaternion rot = Quaternion.AngleAxis (Mathf.Rad2Deg * (theta), vec);
 						normals [i] = rot * normals [i];
-					
+
+						//vecs[i] = vec;
 					}
-				
 					//binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
 					binormals [i] = Vector3.Cross (tangents [i], normals [i]);
-				
 				}
 			
 			
 				// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
-			
+
 				if (closed) {
+					Debug.LogWarning("close---------");
 					float dot = Vector3.Dot (normals [0], normals [numpoints - 1]);
 					theta = Mathf.Acos (Mathf.Clamp (dot, -1, 1));
 					theta /= (float)(numpoints - 1);
@@ -278,63 +279,26 @@ namespace THREE
 					float dot0 = Vector3.Dot (tangents [0], vec0);
 					if (dot0 > 0) {
 						//if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
-					
 						theta = -theta;
-					
 					}
 				
 					for (int i = 1; i < numpoints; i++) {
-	//				// twist a little...
-	//				normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
-	//				binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+						// twist a little...
+						//normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+						//binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
 
-					
 						Quaternion rot = Quaternion.AngleAxis (Mathf.Rad2Deg * (theta * i), tangents [i]);
 						normals [i] = rot * normals [i];
 						binormals [i] = Vector3.Cross (tangents [i], normals [i]);
-					
 					}
-				
 				}
 			}
 
 			public Vector3 clone (Vector3 vec)
 			{
-				//return new Vector3 (vec.x, vec.y, vec.z);
 				return Utils.clone(vec);
 			}
 		}
-
-	
-//	void initialNormal1(Vector3 lastBinormal) {
-//		// fixed start binormal. Has dangers of 0 vectors
-//		normals[ 0 ] = new Vector3();
-//		binormals[ 0 ] = new Vector3();
-//		if (lastBinormal==null) {lastBinormal = new Vector3( 0, 0, 1 ); }
-//
-//		normals[ 0 ] = Vector3.Cross( lastBinormal, tangents[ 0 ] ).normalized;
-//		binormals[ 0 ] = Vector3.Cross( tangents[ 0 ], normals[ 0 ] ).normalized;
-//	}
-
-
-//	void initialNormal2() {
-//		
-//		// This uses the Frenet-Serret formula for deriving binormal
-//		Vector3 t2 = path.getTangentAt( epsilon );
-//		
-//		normals[ 0 ] = new Vector3().subVectors( t2, tangents[ 0 ] ).normalize();
-//		binormals[ 0 ] = new Vector3().crossVectors( tangents[ 0 ], normals[ 0 ] );
-//		
-//		normals[ 0 ].crossVectors( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
-//		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
-//	}
-
-		//
-//		public Vector3 clone (Vector3 vec)
-//		{
-//			//return new Vector3 (vec.x, vec.y, vec.z);
-//			return Utils.clone(vec);
-//		}
 
 	}
 }

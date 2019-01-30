@@ -22,7 +22,7 @@ namespace THREE
 		{
 			List<Vector3> verts = this.vertices;
 			List<Face3> faces = this.faces;
-			List<List<Vector2>> uvs = this.faceVertexUvs;
+//			List<List<Vector2>> uvs = this.faceVertexUvs;
 		
 			//int i, j;
 			Vector3 p;
@@ -62,28 +62,21 @@ namespace THREE
 					uvc = new Vector2 ((float)(j + 1) / slices, (float)(i + 1) / stacks);
 					uvd = new Vector2 ((float)j / slices, (float)(i + 1) / stacks);
 
-					faces.Add (new Face3 (a, b, d));
-					uvs.Add (new List<Vector2> (new Vector2[]{ uva, uvb, uvd }));
+					Face3 face0 = new Face3 (a, b, d);
+					face0.uvs = new Vector2[]{ uva, uvb, uvd };
+					faces.Add (face0);
 				
-					faces.Add (new Face3 (b, c, d));
-					uvs.Add (new List<Vector2> (new Vector2[]{ clone(uvb), uvc, clone(uvd) }));
-		
+					Face3 face1 = new Face3 (b, c, d);
+					face1.uvs = new Vector2[]{ (uvb), uvc, (uvd) };
+					faces.Add (face1);
 				}
-			
 			}
 		
-			// console.log(this);
-		
 			// magic bullet
-			// var diff = this.mergeVertices();
-			// console.log('removed ', diff, ' vertices by merging');
+			//var diff = this.mergeVertices();
+			//Debug.Log("removed "+ diff+ " vertices by merging");
 			
-			this.computeFaceNormals();
-			this.computeVertexNormals();
+            this.SetFaceSmooth();
 		}
-
-
-
-
 	}
 }

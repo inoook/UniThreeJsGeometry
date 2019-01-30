@@ -81,13 +81,11 @@ namespace THREE
 
 		public virtual List<Vector3> getSpacedPoints (float divisions = 5, bool closedPath = false)
 		{
-
 			List<Vector3> pts = new List<Vector3> ();
 		
 			for (int d = 0; d <= divisions; d ++) {
 				pts.Add (this.getPointAt ((float)d / divisions));
 			}
-		
 			return pts;	
 		}
 
@@ -108,7 +106,6 @@ namespace THREE
 
 		public List<float> getLengths (float divisions = 200)
 		{
-		
 			//if ( !divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions): 200;
 			/*
 		if(this.__arcLengthDivisions != null){
@@ -162,16 +159,14 @@ namespace THREE
 		//float getUtoTmapping ( float u, float distance ) {
 		public float getUtoTmapping (float u)
 		{
-			List<float> arcLengths = this.getLengths (); // TODO: CHECK //////////////////////
+			List<float> arcLengths = this.getLengths ();
 			int il = arcLengths.Count;
 			float dist = u * arcLengths [il - 1];
-			//Debug.Log(il+" dist: "+u + " * "+arcLengths[ il - 1 ]);
 			return getUtoTmapping (u, dist);
 		}
 
 		public float getUtoTmapping (float u, float distance)
 		{
-		
 			List<float> arcLengths = this.getLengths ();
 		
 			int i = 0;
@@ -188,9 +183,7 @@ namespace THREE
 		*/
 			//targetArcLength = u * arcLengths[ il - 1 ];
 			targetArcLength = distance;
-		
-			//var time = Date.now();
-		
+			
 			// binary search for the index with largest value smaller than target u distance
 		
 			int low = 0, high = il - 1;
@@ -230,7 +223,7 @@ namespace THREE
 					return 0;
 				}
 
-				t = i / (il - 1);
+				t = (float)i / (float)(il - 1);
 				return t;
 			
 			}
@@ -248,7 +241,7 @@ namespace THREE
 		
 			// add that fractional amount to t
 		
-			t = (float)(i + segmentFraction) / (il - 1);
+			t = (float)(i + segmentFraction) / (float)(il - 1);
 		
 			return t;
 		
@@ -276,15 +269,13 @@ namespace THREE
 			Vector3 pt1 = this.getPoint (t1);
 			Vector3 pt2 = this.getPoint (t2);
 		
-			//Vector3 vec = pt2.clone().sub(pt1);
 			Vector3 vec = pt2 - pt1;
 			return vec.normalized;
 		
 		}
 	
-		public Vector3 getTangentAt (float u)
+        public virtual Vector3 getTangentAt (float u)
 		{
-		
 			float t = this.getUtoTmapping (u);
 			return this.getTangent (t);
 		
@@ -315,7 +306,7 @@ namespace THREE
 			}
 
 			public static float tangentSpline (float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
-			{ // TODO: CHECK//////////
+			{
 			
 				// To check if my formulas are correct
 			

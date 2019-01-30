@@ -17,7 +17,6 @@ namespace THREE
 
 		public override Vector3 getPoint (float t)
 		{
-		
 			Vector3 v = new Vector3 ();
 			int[] c = new int[4];
 			List<Vector3> points = this.points;

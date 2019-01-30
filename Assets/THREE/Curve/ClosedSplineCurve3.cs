@@ -40,13 +40,25 @@ namespace THREE
 			c [2] = (int)((intPoint + 1) % points.Count);
 			c [3] = (int)((intPoint + 2) % points.Count);
 		
-			v.x = Curve.Utils.interpolate (points [c [0]].x, points [c [1]].x, points [c [2]].x, points [c [3]].x, weight);
-			v.y = Curve.Utils.interpolate (points [c [0]].y, points [c [1]].y, points [c [2]].y, points [c [3]].y, weight);
-			v.z = Curve.Utils.interpolate (points [c [0]].z, points [c [1]].z, points [c [2]].z, points [c [3]].z, weight);
+//			v.x = Curve.Utils.interpolate (points [c [0]].x, points [c [1]].x, points [c [2]].x, points [c [3]].x, weight);
+//			v.y = Curve.Utils.interpolate (points [c [0]].y, points [c [1]].y, points [c [2]].y, points [c [3]].y, weight);
+//			v.z = Curve.Utils.interpolate (points [c [0]].z, points [c [1]].z, points [c [2]].z, points [c [3]].z, weight);
+			
+			Vector3 pt0 = points [c [0]],
+			pt1 = points [c [1]],
+			pt2 = points [c [2]],
+			pt3 = points [c [3]];
+			
+			v.x = Curve.Utils.interpolate (pt0.x, pt1.x, pt2.x, pt3.x, weight);
+			v.y = Curve.Utils.interpolate (pt0.y, pt1.y, pt2.y, pt3.y, weight);
+			v.z = Curve.Utils.interpolate (pt0.z, pt1.z, pt2.z, pt3.z, weight);
 		
 			return v;
 		
 		}
+
+
+
 		/*
 	public override Vector3 getSpacedPoints(float t){
 		return getPoint(t);

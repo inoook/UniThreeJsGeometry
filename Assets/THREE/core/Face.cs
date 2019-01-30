@@ -19,12 +19,12 @@ namespace THREE
 		}
 
 
-		public virtual List<int> GetTriangles ()
+		public virtual int[] GetTriangles ()
 		{
 			return null;
 		}
 
-		public virtual List<int> GetVertexIndexList ()
+		public virtual int[] GetVertexIndexList ()
 		{
 			return null;
 		}
@@ -32,25 +32,29 @@ namespace THREE
 	
 	public class Face3 : Face
 	{
-	
 		public int a;
 		public int b;
 		public int c;
-		public List<Vector3> normals;
-		public List<Vector3> vertexNormals;
-		
+		public Vector3[] vertexNormals;
+		public Vector2[] uvs;
+
+		public bool flip = false;
+		public bool doubleSided = false;
+
+		public Face3 ()
+		{
+
+		}
 		public Face3 (int a, int b, int c)
 		{
 			this.a = a;
 			this.b = b;
 			this.c = c;
 
-			//this.normals = new List<Vector3>(new List<Vector3>( new Vector3[3]) );
-			this.vertexNormals = new List<Vector3>(new List<Vector3>( new Vector3[3]) );
-
+			this.vertexNormals = new Vector3[]{ Vector3.zero, Vector3.zero, Vector3.zero };
 		}
 
-		public Face3 (int a, int b, int c, List<Vector3> vertexNormals)
+		public Face3 (int a, int b, int c, Vector3[] vertexNormals)
 		{
 			this.a = a;
 			this.b = b;
@@ -58,20 +62,57 @@ namespace THREE
 
 			this.vertexNormals = vertexNormals;
 		}
-
-		public override List<int> GetTriangles ()
+		public Face3 (int a, int b, int c, Vector3[] vertexNormals, Vector2[] uvs)
 		{
-			List<int> tris = new List<int> ();
-			tris.Add (a);
-			tris.Add (b);
-			tris.Add (c);
-		
-			return tris;
+			this.a = a;
+			this.b = b;
+			this.c = c;
+
+			this.vertexNormals = vertexNormals;
+			this.uvs = uvs;
 		}
 
-		public override List<int> GetVertexIndexList ()
+		public override int[] GetTriangles ()
 		{
-			return new List<int> (new int[]{a, b, c});
+			return GetVertexIndexList();
+		}
+
+		public override int[] GetVertexIndexList ()
+		{
+			if (doubleSided) {
+				return new int[]{ a, b, c, c, b, a };
+			}else{
+				if (!flip) {
+					return new int[]{ a, b, c };
+				} else {
+					return new int[]{ c, b, a };
+				}
+			}
+		}
+
+		public Vector2[] GetUvs ()
+		{
+			if (doubleSided) {
+				return new Vector2[]{ uvs [0], uvs [1], uvs [2], uvs [2], uvs [1], uvs [0] };
+			} else {
+				if (!flip) {
+					return uvs;
+				} else {
+					return new Vector2[]{ uvs [2], uvs [1], uvs [0] };
+				}
+			}
+		}
+		public Vector3[] GetVertexNormals ()
+		{
+			if (doubleSided) {
+				return new Vector3[]{ vertexNormals [0], vertexNormals [1], vertexNormals [2],  -vertexNormals [2], -vertexNormals [1], -vertexNormals [0] };
+			} else {
+				if (!flip) {
+					return vertexNormals;
+				} else {
+					return new Vector3[]{ -vertexNormals [2], -vertexNormals [1], -vertexNormals [0] };
+				}
+			}
 		}
 
 		public override Vector3 normal
@@ -86,7 +127,7 @@ namespace THREE
 
 		public void SetFaceNormalToVertexNormals()
 		{
-			this.vertexNormals = new List<Vector3>(new List<Vector3>( new Vector3[]{normal, normal, normal}) );
+			this.vertexNormals = new Vector3[]{normal, normal, normal};
 		}
 	}
 }

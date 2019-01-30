@@ -22,9 +22,9 @@ namespace THREE
 		
 			float tx, ty, tz;
 		
-			tx = Shape.Utils.b2 (t, this.v0.x, this.v1.x, this.v2.x);
-			ty = Shape.Utils.b2 (t, this.v0.y, this.v1.y, this.v2.y);
-			tz = Shape.Utils.b2 (t, this.v0.z, this.v1.z, this.v2.z);
+			tx = Shape.UtilsShape.b2 (t, this.v0.x, this.v1.x, this.v2.x);
+			ty = Shape.UtilsShape.b2 (t, this.v0.y, this.v1.y, this.v2.y);
+			tz = Shape.UtilsShape.b2 (t, this.v0.z, this.v1.z, this.v2.z);
 		
 			return new Vector3 (tx, ty, tz);
 		}

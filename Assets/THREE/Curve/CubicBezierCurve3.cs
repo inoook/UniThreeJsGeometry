@@ -24,9 +24,9 @@ namespace THREE
 		
 			float tx, ty, tz;
 		
-			tx = Shape.Utils.b3 (t, this.v0.x, this.v1.x, this.v2.x, this.v3.x);
-			ty = Shape.Utils.b3 (t, this.v0.y, this.v1.y, this.v2.y, this.v3.y);
-			tz = Shape.Utils.b3 (t, this.v0.z, this.v1.z, this.v2.z, this.v3.z);
+			tx = Shape.UtilsShape.b3 (t, this.v0.x, this.v1.x, this.v2.x, this.v3.x);
+			ty = Shape.UtilsShape.b3 (t, this.v0.y, this.v1.y, this.v2.y, this.v3.y);
+			tz = Shape.UtilsShape.b3 (t, this.v0.z, this.v1.z, this.v2.z, this.v3.z);
 		
 			return new Vector3 (tx, ty, tz);
 		

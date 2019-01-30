@@ -46,17 +46,15 @@ namespace THREE
 				int v1 = i;
 				int v2 = i + 1;
 				int v3 = 0;
-			
-				this.faces.Add (new Face3 (v1, v2, v3, new List<Vector3>( new Vector3[]{n, n, n} )) );
-				this.faceVertexUvs.Add (new List<Vector2> (new Vector2[] {
+
+				Face3 face = new Face3 (v1, v2, v3, new Vector3[]{ n, n, n });
+				face.uvs = new Vector2[] {
 					uvs [i],
 					uvs [i + 1],
 					centerUV
-				}));
-			
+				};
+				this.faces.Add (face );
 			}
-
-
 		}
 	}
 }

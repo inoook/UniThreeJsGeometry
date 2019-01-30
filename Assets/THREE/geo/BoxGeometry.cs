@@ -108,19 +108,14 @@ namespace THREE
 					Vector2 uvd = new Vector2( (float)( ix + 1 ) / gridX, 1 - (float)iy / gridY );
 					
 					Face3 face = new Face3( a + offset, b + offset, d + offset );
-					face.vertexNormals = new List<Vector3>( new Vector3[]{ normal, normal, normal });
-					//face.materialIndex = materialIndex;
-					
+					face.vertexNormals = new Vector3[]{ normal, normal, normal };
+					face.uvs = new Vector2[]{ uva, uvb, uvd };
 					this.faces.Add( face );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uva, uvb, uvd } ) );
 					
 					face = new Face3( b + offset, c + offset, d + offset );
-					face.vertexNormals = new List<Vector3>( new Vector3[]{ normal, normal, normal });
-					//face.materialIndex = materialIndex;
-
+					face.vertexNormals = new Vector3[]{ normal, normal, normal };
+					face.uvs = new Vector2[]{ uvb, uvc, uvd };
 					this.faces.Add( face );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uvb, uvc, uvd } ) );
-
 				}
 				
 			}

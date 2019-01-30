@@ -45,24 +45,25 @@ namespace THREE
 					int v2 = segment + thetaSegments + i;
 					int v3 = segment + thetaSegments + 1 + i;
 				
-					this.faces.Add (new Face3 (v1, v2, v3, new List<Vector3>( new Vector3[]{ n, n, n} ) ));
-					this.faceVertexUvs.Add (new List<Vector2> (new Vector2[] {
+					Face3 face0 = new Face3 (v1, v2, v3, new Vector3[]{ n, n, n });
+					face0.uvs = new Vector2[] {
 						uvs [v1],
 						uvs [v2],
 						uvs [v3]
-					}));
+					};
+					this.faces.Add (face0);
 				
 					v1 = segment + i;
 					v2 = segment + thetaSegments + 1 + i;
 					v3 = segment + 1 + i;
 				
-					this.faces.Add (new Face3 (v1, v2, v3, new List<Vector3>( new Vector3[]{ n, n, n} ) ));
-					this.faceVertexUvs.Add (new List<Vector2> (new Vector2[] {
+					Face3 face1 = new Face3 (v1, v2, v3, new Vector3[]{ n, n, n} );
+					face1.uvs = new Vector2[] {
 						uvs [v1],
 						uvs [v2],
 						uvs [v3]
-					}));
-				
+					};
+					this.faces.Add (face1);
 				}
 			}
 

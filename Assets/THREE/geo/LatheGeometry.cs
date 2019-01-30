@@ -52,30 +52,29 @@ namespace THREE
 					float u1 = u0 + inverseSegments;
 					float v1 = v0 + inversePointLength;
 
-					this.faces.Add( new Face3( a, b, d ) );
-
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{
-											new Vector2( u0, v0 ),
-											new Vector2( u1, v0 ),
-											new Vector2( u0, v1 )
-					}) );
-
-					this.faces.Add( new Face3( b, c, d ) );
-
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{
-											new Vector2( u1, v0 ),
-											new Vector2( u1, v1 ),
-											new Vector2( u0, v1 )
-					}) );
-
-
+					Face3 face0 = new Face3 (a, b, d);
+					face0.uvs = new Vector2[] {
+						new Vector2 (u0, v0),
+						new Vector2 (u1, v0),
+						new Vector2 (u0, v1)
+					};
+					this.faces.Add( face0 );
+				
+					Face3 face1 = new Face3 (b, c, d);
+					face1.uvs = new Vector2[] {
+						new Vector2( u1, v0 ),
+						new Vector2( u1, v1 ),
+						new Vector2( u0, v1 )
+					};
+					this.faces.Add(face1);
 				}
 			
 			}
 
 			this.mergeVertices();
-			this.computeFaceNormals();
-			this.computeVertexNormals();
-		}
+
+            this.SetFaceSmooth();
+
+        }
 	}
 }

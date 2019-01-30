@@ -41,8 +41,7 @@ namespace THREE
 				THREEVector3 v2 = p [indices [i + 1]];
 				THREEVector3 v3 = p [indices [i + 2]];
 
-				faces.Add (new Face3 (v1.index, v2.index, v3.index, new List<Vector3>( new Vector3[]{ v1.vec, v2.vec, v3.vec }) ));
-				//faces[j] = new Face3( v1.index, v2.index, v3.index );
+				faces.Add (new Face3 (v1.index, v2.index, v3.index, new Vector3[]{ v1.vec, v2.vec, v3.vec } ));
 			}
 		
 			centroid = new THREEVector3 ();
@@ -52,9 +51,9 @@ namespace THREE
 			}
 		
 			// Handle case when face straddles the seam
-			for (int i = 0, l = this.faceVertexUvs.Count; i < l; i ++) {
+			for (int i = 0, l = this.faces.Count; i < l; i ++) {
 			
-				List<Vector2> uvs = this.faceVertexUvs [i];
+				Vector2[] uvs = this.faces [i].uvs;
 			
 				float x0 = uvs [0].x;
 				float x1 = uvs [1].x;
@@ -86,12 +85,10 @@ namespace THREE
 			}
 		
 			// Apply radius
-		
 			for (int i = 0, l = this.t_vertices.Count; i < l; i ++) {
 				//this.t_vertices[ i ].multiplyScalar( radius );
 				this.t_vertices [i].vec *= radius;
 			}
-		
 		
 			// Merge vertices
 			//this.mergeVertices();
@@ -105,104 +102,8 @@ namespace THREE
 			}
 
 			this.mergeVertices ();
-
-			this.computeFaceNormals();
 		}
-
-		public void PolyhedronGeometryBuild___ (List<Vector3> vertices, List<Face3> faces, float radius = 1, int detail = 0)
-		{
-			Debug.LogWarning("PolyhedronGeometryBuild");
-			t_vertices = new List<THREEVector3> ();
-			
-			//this.radius = radius;
-			//this.detail = detail;
-			/*
-		for ( int i = 0, l = vertices.Count; i < l; i += 3 ) {
-			prepare( new THREEVector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
-		}
-		*/
-			for (int i = 0, l = vertices.Count; i < l; i ++) {
-				prepare (new THREEVector3 (vertices [i].x, vertices [i].y, vertices [i].z));
-				// this.t_vertices に要素が追加される
-			}
 		
-			//var midpoints = [];
-			List<THREEVector3> p = this.t_vertices;
-		
-			List<Face3> f = new List<Face3> ();
-			for (int i = 0, l = faces.Count; i < l; i ++) {
-				THREEVector3 v1 = p [faces [i].a];
-				THREEVector3 v2 = p [faces [i].b];
-				THREEVector3 v3 = p [faces [i].c];
-			
-				//f[ i ] = new Face3( v1.index, v2.index, v3.index );
-				f.Add (new Face3 (v1.index, v2.index, v3.index, new List<Vector3>( new Vector3[]{ v1.vec, v2.vec, v3.vec } ) ));
-				//f.Add( new Face3( faces[ i ].a, faces[ i ].b, faces[ i ].c ) );
-			}
-
-			centroid = new THREEVector3 ();
-		
-			for (int i = 0, l = this.faces.Count; i < l; i ++) {
-				subdivide (this.faces [i], detail);
-			}
-
-			// Handle case when face straddles the seam
-			for (int i = 0, l = this.faceVertexUvs.Count; i < l; i ++) {
-			
-				List<Vector2> uvs = this.faceVertexUvs [i];
-			
-				float x0 = uvs [0].x;
-				float x1 = uvs [1].x;
-				float x2 = uvs [2].x;
-			
-				float max = Mathf.Max (x0, Mathf.Max (x1, x2));
-				float min = Mathf.Min (x0, Mathf.Min (x1, x2));
-			
-				if (max > 0.9f && min < 0.1f) { // 0.9 is somewhat arbitrary
-				
-					if (x0 < 0.2f) { 
-						Vector2 v = uvs [0];
-						v.x += 1;
-						uvs [0] = v;
-					}
-					if (x1 < 0.2f) { 
-						//uvs[ 1 ].x += 1;
-						Vector2 v = uvs [1];
-						v.x += 1;
-						uvs [1] = v;
-					}
-					if (x2 < 0.2f) { 
-						//uvs[ 2 ].x += 1;
-						Vector2 v = uvs [2];
-						v.x += 1;
-						uvs [2] = v;
-					}
-				}
-			}
-
-			// Apply radius
-		
-			for (int i = 0, l = this.t_vertices.Count; i < l; i ++) {
-				//this.t_vertices[ i ].multiplyScalar( radius );
-				this.t_vertices [i].vec *= radius;
-			}
-
-
-			// THREEVector3 から Vector3に変換して、描画用のverticesに格納
-			for (int i = 0; i < t_vertices.Count; i++) {
-				this.vertices.Add (t_vertices [i].vec);
-			}
-
-			//this.faces = f;
-
-			// Merge vertices
-			//this.mergeVertices();
-			//this.computeCentroids();
-			
-			this.mergeVertices ();
-			this.computeFaceNormals();
-		}
-
 		THREEVector3 prepare (THREEVector3 vector)
 		{
 			// この中でverticesに要素を追加している
@@ -225,23 +126,20 @@ namespace THREE
 	
 		void make (THREEVector3 v1, THREEVector3 v2, THREEVector3 v3)
 		{
-		
-			Face3 face = new Face3 (v1.index, v2.index, v3.index,  new List<Vector3>( new Vector3[]{ v1.vec, v2.vec, v3.vec }) );
-			this.faces.Add (face);
+			Face3 face = new Face3 (v1.index, v2.index, v3.index, new Vector3[]{ v1.vec, v2.vec, v3.vec } );
 
 			// centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
 			//THREEVector3 centroid = new THREEVector3();
 			//centroid.vec = Vector3.zero;
 			centroid.vec = (v1.vec + v2.vec + v3.vec) / 3.0f;
-
 			float azi = azimuth (centroid);
-		
-			this.faceVertexUvs.Add (new List<Vector2> (new Vector2[]{
-		                               correctUV (v1.uv, v1, azi),
-		                               correctUV (v2.uv, v2, azi),
-		                               correctUV (v3.uv, v3, azi)
-		}));
-		
+
+			face.uvs = new Vector2[] {
+				correctUV (v1.uv, v1, azi),
+				correctUV (v2.uv, v2, azi),
+				correctUV (v3.uv, v3, azi)
+			};
+			this.faces.Add (face);
 		}
 	
 	

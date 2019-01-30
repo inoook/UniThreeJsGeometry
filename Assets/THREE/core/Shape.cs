@@ -23,8 +23,11 @@ namespace THREE
 
 	public class ShapeAndHoleObject
 	{
-		public List<Vector3> shape;
+		public Shape baseShape;
+
+		public List<Vector3> shapeVertices;
 		public List<List<Vector3>> holes;
+		public bool reverse;
 	}
 
 	public class Shape : Path
@@ -32,10 +35,16 @@ namespace THREE
 		//public List<Hole> holes;
 		public List<CurvePath> holes;
 
-		public Shape (List<Vector2> points) : base( points )
+		public List<Vector2> normals;
+
+		public Shape (List<Vector2> points, List<Vector2> normals = null) : base( points )
 	//public Shape (List<Vector3> points)
 		{
-			holes = new List<CurvePath> ();
+			this.holes = new List<CurvePath> ();
+
+			if(normals != null){
+				this.normals = normals;
+			}
 		}
 
 		public Shape ()
@@ -95,7 +104,7 @@ namespace THREE
 		ShapeAndHoleObject extractAllPoints (float divisions)
 		{
 			ShapeAndHoleObject obj = new ShapeAndHoleObject ();
-			obj.shape = this.getTransformedPoints (divisions, null);
+			obj.shapeVertices = this.getTransformedPoints (divisions, null);
 			obj.holes = this.getPointsHoles (divisions);
 
 			return obj;
@@ -118,7 +127,7 @@ namespace THREE
 		ShapeAndHoleObject extractAllSpacedPoints (float divisions)
 		{
 			ShapeAndHoleObject obj = new ShapeAndHoleObject ();
-			obj.shape = this.getTransformedSpacedPoints (divisions, null);
+			obj.shapeVertices = this.getTransformedSpacedPoints (divisions, null);
 			obj.holes = this.getSpacedPointsHoles (divisions);
 
 			return obj;
@@ -133,9 +142,8 @@ namespace THREE
 		/**************************************************************
 		 *	Utils
 		 **************************************************************/
-		public class Utils
+		public class UtilsShape
 		{
-	
 			public static List<List<int>> triangulateShape (List<Vector3> contour, List<List<Vector3>> holes)
 			{
 				//int i, il, f; 

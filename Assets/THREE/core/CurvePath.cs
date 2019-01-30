@@ -300,7 +300,7 @@ namespace THREE
 					oldPts = this.getWrapPoints (oldPts, bends [i]);
 				}
 			} else {
-				Debug.LogWarning ("bend is null");
+				//Debug.LogWarning ("bend is null");
 			}
 			return oldPts;
 		

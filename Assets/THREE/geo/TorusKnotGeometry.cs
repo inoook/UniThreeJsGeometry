@@ -13,8 +13,6 @@ namespace THREE
 
 		public TorusKnotGeometry (float radius = 10, float tube = 4, int radialSegments = 64, int tubularSegments = 8, float  p = 2, float  q = 3, float heightScale = 1)
 		{
-	
-			//List<List<int>> grid = new Array( this.radialSegments );
 			List<List<int>> grid = new List<List<int>> (radialSegments);
 		
 			Vector3 tang = new Vector3 ();
@@ -75,25 +73,18 @@ namespace THREE
 					Vector2 uvb = new Vector2 ((float)(i + 1) / radialSegments, (float)j / tubularSegments);
 					Vector2 uvc = new Vector2 ((float)(i + 1) / radialSegments, (float)(j + 1) / tubularSegments);
 					Vector2 uvd = new Vector2 ((float)i / radialSegments, (float)(j + 1) / tubularSegments);
-				
-//					this.faces.Add (new Face4 (a, b, c, d));
-//					this.faceVertexUvs.Add (new List<Vector2> (new Vector2[] {
-//						uva,
-//						uvb,
-//						uvc,
-//						uvd
-//					}));
 
-					this.faces.Add( new Face3( a, b, d ) );
-					this.faceVertexUvs.Add( new List<Vector2> (new Vector2[] { uva, uvb, uvd } ));
-					
-					this.faces.Add( new Face3( b, c, d ) );
-					this.faceVertexUvs.Add( new List<Vector2> (new Vector2[] { clone(uvb), uvc, clone(uvd) } ));
+					Face3 face0 = new Face3 (a, b, d);
+					face0.uvs = new Vector2[] { uva, uvb, uvd };
+					this.faces.Add( face0 );
+
+					Face3 face1 = new Face3 (b, c, d);
+					face1.uvs = new Vector2[] {  (uvb), uvc,  (uvd) };
+					this.faces.Add( face1 );
 				}
 			}
 
-			this.computeFaceNormals();
-			this.computeVertexNormals();
+            this.SetFaceSmooth();
 		}
 	
 		Vector3 getPos (float u, float in_q, float in_p, float radius, float heightScale)
@@ -109,11 +100,6 @@ namespace THREE
 		
 			return new Vector3 (tx, ty, tz);
 		}
-
-//		Vector2 clone(Vector2 vec)
-//		{
-//			return Utils.clone(vec);
-//		}
 
 	}
 }

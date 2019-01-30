@@ -52,7 +52,6 @@ namespace THREE
 		}
 
 		// TODO Clean up PATH API
-	
 		// Create path using straight lines to connect all points
 		// - vectors: array of Vector2
 	
@@ -313,8 +312,8 @@ namespace THREE
 					
 						t = (float)j / divisions;
 					
-						tx = Shape.Utils.b2 (t, cpx0, cpx1, cpx);
-						ty = Shape.Utils.b2 (t, cpy0, cpy1, cpy);
+						tx = Shape.UtilsShape.b2 (t, cpx0, cpx1, cpx);
+						ty = Shape.UtilsShape.b2 (t, cpy0, cpy1, cpy);
 					
 						points.Add (new Vector3 (tx, ty));
 					}
@@ -352,8 +351,8 @@ namespace THREE
 					
 						t = (int)j / divisions;
 					
-						tx = Shape.Utils.b3 (t, cpx0, cpx1, cpx2, cpx);
-						ty = Shape.Utils.b3 (t, cpy0, cpy1, cpy2, cpy);
+						tx = Shape.UtilsShape.b3 (t, cpx0, cpx1, cpx2, cpx);
+						ty = Shape.UtilsShape.b3 (t, cpy0, cpy1, cpy2, cpy);
 					
 						points.Add (new Vector2 (tx, ty));
 						

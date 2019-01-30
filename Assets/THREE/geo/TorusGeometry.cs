@@ -40,7 +40,6 @@ namespace THREE
 					uvs.Add (new Vector2 ((float)i / tubularSegments, (float)j / radialSegments));
 
 					normals.Add ((vertex - center).normalized);
-				
 				}
 			}
 		
@@ -54,19 +53,19 @@ namespace THREE
 					int c = (tubularSegments + 1) * (j - 1) + i;
 					int d = (tubularSegments + 1) * j + i;
 
-					var face = new Face3( a, b, d, new List<Vector3>(new Vector3[]{ clone(normals[ a ]), clone(normals[ b ]), clone(normals[ d ]) }) );
-					this.faces.Add( face );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uvs[ a ], uvs[ b ], uvs[ d ] }) );
+					Face3 face0 = new Face3( a, b, d, new Vector3[]{ (normals[ a ]), (normals[ b ]), (normals[ d ]) } );
+					face0.uvs = new Vector2[]{ uvs [a], uvs [b], uvs [d] };
+					this.faces.Add( face0 );
 					
-					face = new Face3( b, c, d, new List<Vector3>(new Vector3[]{ clone(normals[ b ]), clone(normals[ c ]), clone(normals[ d ]) }) );
-					this.faces.Add( face );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uvs[ b ], uvs[ c ], uvs[ d ] }) );
+					Face3 face1 = new Face3( b, c, d, new Vector3[]{ (normals[ b ]), (normals[ c ]), (normals[ d ]) } );
+					face1.uvs = new Vector2[]{ uvs [b], uvs [c], uvs [d] };
+					this.faces.Add( face1 );
 
 				}
 			
 			}
 
-			this.computeFaceNormals();
+			//this.computeFaceNormals();
 			//this.computeVertexNormals();
 		}
 	}

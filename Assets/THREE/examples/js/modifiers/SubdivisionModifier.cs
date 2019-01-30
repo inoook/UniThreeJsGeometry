@@ -58,21 +58,18 @@ namespace THREE
 				this.smooth( geometry );
 			}
 
-			geometry.faceVertexUvs = null;
 			Debug.Log("TODO: UVS");
 			
-			geometry.computeFaceNormals();
-			geometry.computeVertexNormals();
-		}
+            // smoothing
+            geometry.SetFaceSmooth();
+        }
 
 		// ---------------------------------
 
 		// Some constants
 		bool WARNINGS = !true; // Set to true for development
-		string[] ABC = new string[]{ "a", "b", "c" };
-		//int[] ABC = new int[]{ 0, 1, 2 };
-		
-		
+//		string[] ABC = new string[]{ "a", "b", "c" };
+
 		Edge getEdge(int a, int b, Dictionary<string, Edge> map ) {
 			
 			int vertexIndexA = Mathf.Min( a, b );
@@ -122,7 +119,7 @@ namespace THREE
 
 		//void generateLookups(List<Vector3> vertices, List<Face3> faces, List<MetaVertex> metaVertices, List<Edge> edges ) {
 		void generateLookups(List<Vector3> vertices, List<Face3> faces, MetaVertex[] metaVertices, Dictionary<string, Edge>  edges ) {
-			Face3 face, edge;
+			Face3 face;
 			
 			for (int i = 0, il = vertices.Count; i < il; i++ ) {
 				//metaVertices[ i ] = { edges: [] };
@@ -156,7 +153,7 @@ namespace THREE
 			List<Vector3> newVertices;
 			List<Face3> newFaces; // newUVs = [];
 			
-			int n, l;
+			int n;
 			//List<Edge> sourceEdges;
 			Dictionary<string, Edge> sourceEdges;
 			//var metaVertices, sourceEdges;

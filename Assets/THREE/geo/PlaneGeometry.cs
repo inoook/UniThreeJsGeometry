@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,23 +6,8 @@ namespace THREE
 {
 	public class PlaneGeometry : Geometry
 	{
-		/*
-	public float width;
-	public float height;
-
-	int widthSegments;
-	int heightSegments;
-	*/
 		public PlaneGeometry (float width, float height, int widthSegments, int heightSegments)
 		{
-			/*
-		this.width = width;
-		this.height = height;
-		
-		this.widthSegments = widthSegments;
-		this.heightSegments = heightSegments;
-		*/
-
 			int ix, iz;
 			float width_half = width / 2;
 			float height_half = height / 2;
@@ -67,30 +52,17 @@ namespace THREE
 					Vector2 uvc = new Vector2( (float)( ix + 1 ) / gridX, 1 - (float)( iz + 1 ) / gridZ );
 					Vector2 uvd = new Vector2( (float)( ix + 1 ) / gridX, 1 - (float)iz / gridZ );
 					
-					Face3 face = new Face3( a, b, d, new List<Vector3>( new Vector3[]{normal, normal, normal}));
-					//face.normal.copy( normal );
-					//face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-					//face.materialIndex = materialIndex;
+					Face3 face0 = new Face3( a, b, d, new Vector3[]{normal, normal, normal} );
 					
-					this.faces.Add( face );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uva, uvb, uvd } ) );
+					face0.uvs = new Vector2[]{ uva, uvb, uvd };
+					this.faces.Add( face0 );
 					
-					face = new Face3( b, c, d, new List<Vector3>( new Vector3[]{normal, normal, normal}));
-					//face.normal.copy( normal );
-					//face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-					//face.materialIndex = materialIndex;
+					Face3 face1 = new Face3( b, c, d, new Vector3[]{normal, normal, normal} );
 					
-					this.faces.Add( face );
-					this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ uvb, uvc, uvd } ) );
-
-
+					face1.uvs = new Vector2[]{ uvb, uvc, uvd };
+					this.faces.Add( face1 );
 				}
 			}
-		
-			//this.computeCentroids();
-			//
 		}
-
-		public Mesh mesh;
 	}
 }

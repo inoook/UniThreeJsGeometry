@@ -14,10 +14,10 @@ namespace THREE
 
 	public class NURBSSurface {
 
-		int degree1 = degree1;
-		int degree2 = degree2;
-		float[] knots1 = knots1;
-		float[] knots2 = knots2;
+		int degree1;
+		int degree2;
+		float[] knots1;
+		float[] knots2;
 		//List<List<Vector4>> controlPoints;
 		Vector4[][] controlPoints;
 

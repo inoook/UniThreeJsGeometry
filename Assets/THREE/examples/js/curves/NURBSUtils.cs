@@ -252,7 +252,6 @@ namespace THREE{
 			List<Vector3> Pw = new List<Vector3>();
 			
 			for (int i = 0; i < P.Length; ++i) {
-				//Vector3 point = P[i].clone();
 				Vector4 point = P[i];
 				float w = point.w;
 				
@@ -263,11 +262,9 @@ namespace THREE{
 				Pw[i] = point;
 			}
 			for (int k = 0; k <= du; ++k) {
-				//Vector3 point = Pw[span - p].clone().multiplyScalar(nders[k][0]);
 				Vector3 point = Pw[span - p] * (nders[k][0]);
 				
 				for (int j = 1; j <= p; ++j) {
-					//point.add(Pw[span - p + j].clone().multiplyScalar(nders[k][j]));
 					point = point + (Pw[span - p + j] * (nders[k][j]));
 				}
 				
@@ -331,11 +328,9 @@ namespace THREE{
 				Vector4 v = Aders[k];
 				
 				for (int i = 1; i <= k; ++i) {
-					//v.sub(CK[k - i].clone().multiplyScalar(this.calcKoverI(k,i) * wders[i]));
 					v = v - (CK[k - i] * (calcKoverI(k,i) * wders[i]));
 				}
 				
-				//CK[k] = v.divideScalar(wders[0]);
 				CK[k] = v / (wders[0]);
 			}
 			
@@ -378,24 +373,20 @@ namespace THREE{
 			for (int l = 0; l <= q; ++l) {
 				temp[l] = new Vector4(0, 0, 0, 0);
 				for (var k = 0; k <= p; ++k) {
-					//Vector4 point = P[uspan - p + k][vspan - q + l].clone();
 					Vector4 point = P[uspan - p + k][vspan - q + l];
 					float w = point.w;
 					point.x *= w;
 					point.y *= w;
 					point.z *= w;
-					//temp[l].add(point.multiplyScalar(Nu[k]));
 					temp[l] = temp[l] + (point * (Nu[k]));
 				}
 			}
 			
 			Vector4 Sw = new Vector4(0, 0, 0, 0);
 			for (int l = 0; l <= q; ++l) {
-				//Sw.add(temp[l].multiplyScalar(Nv[l]));
 				Sw = Sw + (temp[l] * (Nv[l]));
 			}
 			
-			//Sw.divideScalar(Sw.w);
 			Sw = Sw / (Sw.w);
 			return new Vector3(Sw.x, Sw.y, Sw.z);
 		}

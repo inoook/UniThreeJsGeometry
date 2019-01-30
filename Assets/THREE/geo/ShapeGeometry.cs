@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @author jonobr1 / http://jonobr1.com
  *
  * Creates a one-sided polygonal geometry from a path shape. Similar to
@@ -34,18 +34,16 @@ namespace THREE
 			this.shapebb = shapes[ shapes.Count - 1 ].getBoundingBox();
 			this.addShapeList( shapes, options );
 
-			this.computeFaceNormals();
-			this.copyFaceNormalToVertexNormals();
-		}
+            this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
+        }
 
 		public ShapeGeometry(Shape shape, Option options ){
 			
 			this.shapebb = shape.getBoundingBox();
 			this.addShape( shape, options );
 
-			this.computeFaceNormals();
-			this.copyFaceNormalToVertexNormals();
-		}
+            this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
+        }
 
 		/**
 		 * Add an array of shapes to THREE.ShapeGeometry.
@@ -81,10 +79,10 @@ namespace THREE
 			int shapesOffset = this.vertices.Count;
 			ShapeAndHoleObject shapePoints = shape.extractPoints( curveSegments );
 			
-			List<Vector3> vertices = shapePoints.shape;
+			List<Vector3> vertices = shapePoints.shapeVertices;
 			List<List<Vector3>> holes = shapePoints.holes;
 			
-			bool reverse = !Shape.Utils.isClockWise( vertices );
+			bool reverse = !Shape.UtilsShape.isClockWise( vertices );
 			
 			if ( reverse ) {
 				//vertices = vertices.reverse();
@@ -96,7 +94,7 @@ namespace THREE
 					
 					List<Vector3> hole = holes[ i ];
 					
-					if ( Shape.Utils.isClockWise( hole ) ) {
+					if ( Shape.UtilsShape.isClockWise( hole ) ) {
 						
 						//holes[ i ] = hole.reverse();
 						hole.Reverse();
@@ -108,7 +106,7 @@ namespace THREE
 				
 			}
 			
-			List<List<int>> faces = Shape.Utils.triangulateShape( vertices, holes );
+			List<List<int>> faces = Shape.UtilsShape.triangulateShape( vertices, holes );
 
 			// Vertices
 			//var contour = vertices;
@@ -144,9 +142,10 @@ namespace THREE
 				int b = face[1] + shapesOffset;
 				int c = face[2] + shapesOffset;
 
-				this.faces.Add( new Face3( a, b, c ) );
+				Face3 f = new Face3( a, b, c );
+				f.uvs = uvgen.generateBottomUV( this, shape, a, b, c ).ToArray();
+				this.faces.Add(f);
 
-				this.faceVertexUvs.Add( uvgen.generateBottomUV( this, shape, a, b, c ) );
 				//this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f) })); // debug
 			}
 		}

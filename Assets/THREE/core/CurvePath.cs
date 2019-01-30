@@ -308,7 +308,6 @@ namespace THREE
 	
 		public List<Vector3> getTransformedSpacedPoints (float segments, List<Bend> bends)
 		{
-		
 			List<Vector3> oldPts = this.getSpacedPoints (segments);
 		
 			int i, il;

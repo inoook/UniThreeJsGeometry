@@ -175,7 +175,7 @@ namespace THREE
 				List<Vector3> normals = new List<Vector3> (new Vector3[numpoints]);
 				List<Vector3> binormals = new List<Vector3> (new Vector3[numpoints]);
 			
-                Debug.LogWarning("FrenetFrames: "+numpoints + " / "+path);
+                //Debug.LogWarning("FrenetFrames: "+numpoints + " / "+path);
 				//vecs = new List<Vector3>(new Vector3[numpoints]);
 
 				// expose internals

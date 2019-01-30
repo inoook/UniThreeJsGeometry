@@ -35,26 +35,22 @@ namespace THREE
 	public class ExtrudeGeometry : Geometry
 	{
 		public class Option{
-			public int amount = 100;
+			public int amount = 100;// pathを指定しない時の押し出し量
+
 			public float bevelThickness = 6;
 			public float bevelSize = 4;
 			public int bevelSegments = 3;
-
 			public bool bevelEnabled = true;
 
 			public int curveSegments = 12;
 
-			public int steps = 1;
+			public int steps = 1;// 押し出しの分割数
 
 			public Curve extrudePath;
 
-			//public Material material;
-			//public Material extrudeMaterial;
+			public IUVGenerator uvGenerator;
 
-			//public WorldUVGenerator UVGenerator ExtrudeGeometry.WorldUVGenerator;
-			public WorldUVGenerator UVGenerator;
-
-			public THREE.TubeGeometry.FrenetFrames frames;
+			public TubeGeometry.FrenetFrames frames;
 		}
 
 
@@ -72,21 +68,14 @@ namespace THREE
 			
 			this.addShapeList(shapes, options );
 
-//			// shapeにnormalが無いときは計算を行う。
+//			// shapeにnormalが無いときは計算を行う。 shapeにnormalを設定できるようにしている。
 //			this.computeFaceNormals();
 //			this.copyFaceNormalToVertexNormals();
-			
-			// can't really use automatic vertex normals
-			// as then front and back sides get smoothed too
-			// should do separate smoothing just for sides
-
-			//this.computeVertexNormals();
 		}
 
 		public ExtrudeGeometry (Shape shape, Option options )
 		{
 			//this.shapebb = shape.getBoundingBox();
-			
 			this.addShape( shape, options );
 		}
 
@@ -98,43 +87,21 @@ namespace THREE
 				this.addShape( shape, options );
 			}
 		}
-		
-		public ExtrudeGeometry (List<Shape> shapes, List<ShapeAndHoleObject> shapeAndHoles, Option options )
-		{
-			this.addShapeList(shapes, shapeAndHoles, options );
-		}
-		void addShapeList(List<Shape> shapes, List<ShapeAndHoleObject> shapeAndHoles, Option options ) {
-			int sl = shapeAndHoles.Count;
-			
-			for ( int s = 0; s < sl; s ++ ) {
-				ShapeAndHoleObject shapeAndHole = shapeAndHoles[ s ];
-				this.addShape(shapeAndHole, options );
-			}
-		}
-		public ExtrudeGeometry (ShapeAndHoleObject shapeAndHole, Option options )
-		{
-			this.addShape(shapeAndHole, options );
-		}
-		void addShape(Shape shape, Option options)
-		{
-			ShapeAndHoleObject shapePoints = GetShapeAndHoleObject(shape, options);
-			addShape(shapePoints, options);
-		}
 
-        public static ShapeAndHoleObject GetShapeAndHoleObject(Shape shape, Option options )
+        void ExtractShape(Shape shape, Option options )
 		{
 			List<Vector3> ahole;
 
-			ShapeAndHoleObject shapePoints = shape.extractPoints( options.curveSegments );
-			
-			List<Vector3> vertices = shapePoints.shapeVertices;
-			List<List<Vector3>> holes = shapePoints.holes;
+			shape.extractPoints( options.curveSegments );
+
+			List<Vector3> vertices = shape.shapeVertices;
+			List<List<Vector3>> holes = shape.holesList;
 			
 			bool reverse = !Shape.UtilsShape.isClockWise( vertices );
 			if ( reverse ) {
 				vertices.Reverse();
 				
-				for (int h = 0, hl = holes.Count; h < hl; h ++ ) {
+				for (int h = 0; h < holes.Count; h++) {
 					ahole = holes[ h ];
 					
 					if ( Shape.UtilsShape.isClockWise( ahole ) ) {
@@ -144,26 +111,19 @@ namespace THREE
 				}
 			}
 
-			shapePoints.baseShape = shape;
-			shapePoints.shapeVertices = vertices;
-			shapePoints.holes = holes;
-			shapePoints.reverse = reverse;
-
-			return shapePoints;
+            shape.holesList = holes;
+            shape.reverse = reverse;
 		}
 
-		public void UpdateShape(ShapeAndHoleObject shapePoints, Option options)
+		public void UpdateShape(Shape shape, Option options)
 		{
 			vertIndex = 0;
-			addShape(shapePoints, options );
+			addShape(shape, options );
 		}
 
-		//void addShape(Shape shape, Option options ) {
-		void addShape(ShapeAndHoleObject shapePoints, Option options ) {
+        void addShape(Shape shape, Option options ) {
+            ExtractShape(shape, options);
 
-			Shape shape = shapePoints.baseShape;
-			int amount = options.amount;
-			
 			float bevelThickness = options.bevelThickness;
 			float bevelSize = options.bevelSize;
 			int bevelSegments = options.bevelSegments;
@@ -177,7 +137,7 @@ namespace THREE
 			//Material extrudeMaterial = options.extrudeMaterial;
 			
 			// Use default WorldUVGenerator if no UV generators are specified.
-			WorldUVGenerator uvgen = options.UVGenerator;
+			IUVGenerator uvgen = options.uvGenerator;
 			if(uvgen == null){
 				uvgen = new WorldUVGenerator();
 			}
@@ -223,32 +183,10 @@ namespace THREE
 
 			//var ahole, h, hl; // looping of holes
 			List<Vector3> ahole;
-
-			//int shapesOffset = this.vertices.Count;
-			int shapesOffset = vertIndex;
-
-//			ShapeAndHoleObject shapePoints = shape.extractPoints( curveSegments );
-//			
-//			List<Vector3> vertices = shapePoints.shape;
-//			List<List<Vector3>> holes = shapePoints.holes;
-//
-//			bool reverse = !Shape.Utils.isClockWise( vertices ) ;
-//
-//			if ( reverse ) {
-//				vertices.Reverse();
-//
-//				for (int h = 0, hl = holes.Count; h < hl; h ++ ) {
-//					ahole = holes[ h ];
-//					
-//					if ( Shape.Utils.isClockWise( ahole ) ) {
-//						ahole.Reverse();
-//						holes[ h ] = ahole;
-//					}
-//				}
-//			}
-			List<Vector3> vertices = shapePoints.shapeVertices;
-			List<List<Vector3>> holes = shapePoints.holes;
-			bool reverse = shapePoints.reverse;
+            
+			List<Vector3> vertices = shape.shapeVertices;
+			List<List<Vector3>> holes = shape.holesList;
+			bool reverse = shape.reverse;
 			
 			List<List<int>> faces = Shape.UtilsShape.triangulateShape ( vertices, holes );
 
@@ -359,10 +297,11 @@ namespace THREE
 				}
 			}
 
-			// Add stepped vertices...
-			// Including front facing vertices
+            // Add stepped vertices...
+            // Including front facing vertices
+            int amount = options.amount;
 
-			for (int s = 1; s <= steps; s ++ ) {
+            for (int s = 1; s <= steps; s ++ ) {
 				
 				for (int i = 0; i < vlen; i ++ ) {
 					
@@ -419,15 +358,14 @@ namespace THREE
 			faceIndex = 0;
 			// Top and bottom faces
 			if(!isClosePath){
-				buildLidFaces(vlen, faces, flen, steps, bevelSegments, bevelEnabled, shapesOffset, shape, uvgen, options, reverse);
+				buildLidFaces(vlen, faces, flen, steps, bevelSegments, bevelEnabled, shape, uvgen, options, reverse);
 			}
 			// Sides faces
-			buildSideFaces(vlen, contour, holes, steps, bevelSegments, shapesOffset, uvgen, shape, options, isClosePath, reverse);
+			buildSideFaces(vlen, contour, holes, steps, bevelSegments, uvgen, shape, options, isClosePath, reverse);
 		}
 
 		Vector3 scalePt2 (Vector3 pt, Vector3 vec, float size ) {
 			return (vec * size) + ( pt );
-			
 		}
 
 		Vector3 getBevelVec(Vector3 inPt, Vector3 inPrev, Vector3 inNext ) {
@@ -525,11 +463,9 @@ namespace THREE
 
 			return	new Vector3( t_x, t_y, 0 );
 		}
-
-
+        
 		/////  Internal functions
-		
-		void buildLidFaces(int vlen, List<List<int>> faces, int flen, int steps, int bevelSegments, bool bevelEnabled, int shapesOffset, Shape shape, WorldUVGenerator uvgen, Option options, bool reverse = false) {
+		void buildLidFaces(int vlen, List<List<int>> faces, int flen, int steps, int bevelSegments, bool bevelEnabled, Shape shape, IUVGenerator uvgen, Option options, bool reverse = false) {
 			
 			if ( bevelEnabled ) {
 				
@@ -541,8 +477,7 @@ namespace THREE
 					
 					List<int> face = faces[ i ];
 					//f3( face[ 2 ] + offset, face[ 1 ]+ offset, face[ 0 ] + offset, true );
-					f3( face[2] + offset, face[1]+ offset, face[0] + offset, shape, true, shapesOffset, uvgen, options);
-					
+					f3( face[2] + offset, face[1]+ offset, face[0] + offset, shape, true, uvgen, options);
 				}
 				
 				layer = steps + bevelSegments * 2;
@@ -550,49 +485,45 @@ namespace THREE
 				
 				// Top faces
 				for (int i = 0; i < flen; i ++ ) {
-					
 					List<int> face = faces[ i ];
 					//f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset, false );
-					f3( face[0] + offset, face[1] + offset, face[2] + offset, shape, false, shapesOffset, uvgen, options);
+					f3( face[0] + offset, face[1] + offset, face[2] + offset, shape, false, uvgen, options);
 				}
 				
 			} else {
-				
 				// Bottom faces
-				
 				for (int i = 0; i < flen; i++ ) {
 					List<int> face = faces[ i ];
 					//f3( face[ 2 ], face[ 1 ], face[ 0 ], true );
-					f3( face[2], face[1], face[0], shape, true, shapesOffset, uvgen, options);
+					f3( face[2], face[1], face[0], shape, true, uvgen, options);
 				}
 				
 				// Top faces
-				
 				for (int i = 0; i < flen; i ++ ) {
 					List<int> face = faces[ i ];
 					//f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps, false );
-					f3( face[0] + vlen * steps, face[1] + vlen * steps, face[2] + vlen * steps, shape, false, shapesOffset, uvgen, options);
+					f3( face[0] + vlen * steps, face[1] + vlen * steps, face[2] + vlen * steps, shape, false, uvgen, options);
 				}
 			}
 			
 		}
 		
 		// Create faces for the z-sides of the shape
-		void buildSideFaces(int vlen, List<Vector3> contour, List<List<Vector3>> holes, int steps, int bevelSegments, int shapesOffset, WorldUVGenerator uvgen, Shape shape, Option options, bool closePath = false, bool reverse = true) {
+		void buildSideFaces(int vlen, List<Vector3> contour, List<List<Vector3>> holes, int steps, int bevelSegments, IUVGenerator uvgen, Shape shape, Option options, bool closePath = false, bool reverse = true) {
 
 			int layeroffset = 0;
-			sidewalls(vlen, contour, layeroffset, steps, bevelSegments, shapesOffset, uvgen, shape, options, closePath, reverse);
+			sidewalls(vlen, contour, layeroffset, steps, bevelSegments, uvgen, shape, options, closePath, reverse);
 			layeroffset += contour.Count;
 			
 			// holes sideWall
 			for (int h = 0, hl = holes.Count;  h < hl; h ++ ) {
 				List<Vector3> ahole = holes[ h ];
-				sidewalls(vlen, ahole, layeroffset, steps, bevelSegments, shapesOffset, uvgen, shape, options, closePath, reverse);
+				sidewalls(vlen, ahole, layeroffset, steps, bevelSegments, uvgen, shape, options, closePath, reverse);
 				layeroffset += ahole.Count;
 			}
 		}
 		
-		void sidewalls(int vlen, List<Vector3> contour, int layeroffset, int steps, int bevelSegments, int shapesOffset, WorldUVGenerator uvgen, Shape shape, Option options, bool closePath = false, bool reverse = true) {
+		void sidewalls(int vlen, List<Vector3> contour, int layeroffset, int steps, int bevelSegments, IUVGenerator uvgen, Shape shape, Option options, bool closePath = false, bool reverse = true) {
 			
 			int j, k;
 			
@@ -611,9 +542,6 @@ namespace THREE
 				j = i;
 				k = i - 1;
 				if ( k < 0 ) k = contour.Count - 1;
-				
-				//console.log('b', i,j, i-1, k,vertices.length);
-				//Debug.Log(">>> k: "+k + " steps: "+steps);
 				
 				int s = 0;
 				//int sl = steps + bevelSegments * 2;
@@ -649,7 +577,7 @@ namespace THREE
 						tQ0 = Quaternion.identity;
 						tQ1 = Quaternion.identity;
 					}
-					f4( a, b, c, d, shape, contour, s, sl, j, k, shapesOffset, uvgen, options, reverse, tQ0, tQ1 );
+					f4( a, b, c, d, shape, contour, s, sl, j, k, uvgen, options, reverse, tQ0, tQ1 );
 				}
 			}
 		}
@@ -670,11 +598,7 @@ namespace THREE
 		}
 
 		int faceIndex = 0;
-		void f3(int a, int b, int c, Shape shape, bool isBottom, int shapesOffset, WorldUVGenerator uvgen, Option options) {
-			
-			a += shapesOffset;
-			b += shapesOffset;
-			c += shapesOffset;
+		void f3(int a, int b, int c, Shape shape, bool isBottom, IUVGenerator uvgen, Option options) {
 			
 			// normal, color, material
 			Face3 face;
@@ -699,26 +623,13 @@ namespace THREE
 			}
 			face.vertexNormals = new Vector3[]{normal, normal, normal };
 
-			List<Vector2> uvs = isBottom ? uvgen.generateBottomUV( this, shape, a, b, c ) : uvgen.generateTopUV( this, shape, a, b, c );
-			face.uvs = uvs.ToArray();
-
-			// TODO: faceVertexUvs の変更で問題点ないか確認
-//			if(faceIndex-1 >= faceVertexUvs.Count){
-//				this.faceVertexUvs.Add( new List<Vector2>( uvs ));
-//			}else{
-//				this.faceVertexUvs[faceIndex - 1] = new List<Vector2>( uvs );
-//			}
-//			//this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ Vector2.one, Vector2.one, Vector2.one } )); // Debug
+            Vector2[] uvs = !isBottom ? uvgen.generateBottomUV( this, shape, a, b, c ) : uvgen.generateTopUV( this, shape, face.a, b, c );
+			face.uvs = uvs;
 		}
 		
-		void f4(int a, int b, int c, int d, Shape shape, List<Vector3> wallContour, int stepIndex, int stepsLength, int contourIndex1, int contourIndex2, int shapesOffset , WorldUVGenerator uvgen, Option options, bool reverse, Quaternion tQ0, Quaternion tQ1) {
+		void f4(int a, int b, int c, int d, Shape shape, List<Vector3> wallContour, int stepIndex, int stepsLength, int contourIndex1, int contourIndex2, IUVGenerator uvgen, Option options, bool reverse, Quaternion tQ0, Quaternion tQ1) {
 			
-			a += shapesOffset;
-			b += shapesOffset;
-			c += shapesOffset;
-			d += shapesOffset;
-
-			List<Vector2> uvs = uvgen.generateSideWallUV( this, shape, wallContour, a, b, c, d,
+            Vector2[] uvs = uvgen.generateSideWallUV( this, shape, wallContour, a, b, c, d,
 				stepIndex, stepsLength, contourIndex1, contourIndex2 );
 
 			Face3 face0;
@@ -779,9 +690,6 @@ namespace THREE
 					normal1 = norm;
 				}
 				
-//				face0.vertexNormals = new Vector3[]{normal0, normal0, normal1 };
-//				face1.vertexNormals = new Vector3[]{normal0, normal1, normal1 };
-
 				face0.vertexNormals[0] = normal0;
 				face0.vertexNormals[1] = normal0;
 				face0.vertexNormals[2] = normal1;
@@ -790,34 +698,21 @@ namespace THREE
 				face1.vertexNormals[1] = normal1;
 				face1.vertexNormals[2] = normal1;
 			}
-			//
-
-			// TODO: faceVertexUvs の変更で問題点ないか確認
-//			List<Vector2> uvs0;
-//			if(faceIndex - 2 >= this.faceVertexUvs.Count){
-//				uvs0 = new List<Vector2>( new Vector2[]{ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] } );
-//				this.faceVertexUvs.Add(uvs0);
-//			}else{
-//				this.faceVertexUvs[faceIndex - 2] = new List<Vector2>( new Vector2[]{ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] } );
-//			}
-
-
-//			List<Vector2> uvs1;
-//			if(faceIndex - 1 >= this.faceVertexUvs.Count){
-//				uvs1 = new List<Vector2>( new Vector2[]{ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] } );
-//				this.faceVertexUvs.Add(uvs1);
-//			}else{
-//				this.faceVertexUvs[faceIndex - 1] = new List<Vector2>( new Vector2[]{ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] } );
-//			}
-
-//			this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ Vector2.one, Vector2.one, Vector2.one, Vector2.one } )); // Debug
-//			this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ Vector2.one, Vector2.one, Vector2.one, Vector2.one } )); // Debug
 		}
-		
-		//
-		public class WorldUVGenerator
-		{
-			public List<Vector2> generateTopUV(THREE.Geometry geometry, Shape extrudedShape, int indexA,  int indexB,  int indexC )
+
+        #region UVGenerator
+        public interface IUVGenerator
+        {
+            Vector2[] generateTopUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC);
+            Vector2[] generateBottomUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC);
+            Vector2[] generateSideWallUV(THREE.Geometry geometry, Shape extrudedShape, List<Vector3> wallContour,
+                                             int indexA, int indexB, int indexC, int indexD, int stepIndex, int stepsLength,
+                                             int contourIndex1, int contourIndex2);
+        }
+
+        public class WorldUVGenerator : IUVGenerator
+        {
+			public Vector2[] generateTopUV(THREE.Geometry geometry, Shape extrudedShape, int indexA,  int indexB,  int indexC )
 			{
 				float ax = geometry.vertices[ indexA ].x;
 				float ay = geometry.vertices[ indexA ].y;
@@ -828,54 +723,137 @@ namespace THREE
 				float cx = geometry.vertices[ indexC ].x;
 				float cy = geometry.vertices[ indexC ].y;
 				
-				return new List<Vector2>(new Vector2[]{
+				return new Vector2[]{
 				        new Vector2( ax, ay ),
 				        new Vector2( bx, by ),
-						new Vector2( cx, cy ) } );
+						new Vector2( cx, cy ) };
 			}
 
-			public List<Vector2> generateBottomUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC )
+			public Vector2[] generateBottomUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC )
 			{
 				return this.generateTopUV( geometry, extrudedShape, indexA, indexB, indexC );
 			}
 
-			public List<Vector2> generateSideWallUV(THREE.Geometry geometry, Shape extrudedShape, List<Vector3> wallContour, 
+			public Vector2[] generateSideWallUV(THREE.Geometry geometry, Shape extrudedShape, List<Vector3> wallContour, 
 			                                 int indexA, int indexB, int indexC, int indexD, int stepIndex, int stepsLength,
 			                                 int contourIndex1, int contourIndex2 ) {
-				
-				float ax = geometry.vertices[ indexA ].x,
-				ay = geometry.vertices[ indexA ].y,
-				az = geometry.vertices[ indexA ].z,
-				
-				bx = geometry.vertices[ indexB ].x,
-				by = geometry.vertices[ indexB ].y,
-				bz = geometry.vertices[ indexB ].z,
-				
-				cx = geometry.vertices[ indexC ].x,
-				cy = geometry.vertices[ indexC ].y,
-				cz = geometry.vertices[ indexC ].z,
-				
-				dx = geometry.vertices[ indexD ].x,
-				dy = geometry.vertices[ indexD ].y,
-				dz = geometry.vertices[ indexD ].z;
-				
+
+                float ax = geometry.vertices[indexA].x;
+                float ay = geometry.vertices[indexA].y;
+                float az = geometry.vertices[indexA].z;
+
+                float bx = geometry.vertices[indexB].x;
+                float by = geometry.vertices[indexB].y;
+                float bz = geometry.vertices[indexB].z;
+
+                float cx = geometry.vertices[indexC].x;
+                float cy = geometry.vertices[indexC].y;
+                float cz = geometry.vertices[indexC].z;
+
+                float dx = geometry.vertices[indexD].x;
+                float dy = geometry.vertices[indexD].y;
+                float dz = geometry.vertices[indexD].z;
+
 				if ( Mathf.Abs( ay - by ) < 0.01f ) {
-					return new List<Vector2>(new Vector2[]{
+					return new Vector2[]{
 					        new Vector2( ax, 1 - az ),
 					        new Vector2( bx, 1 - bz ),
 					        new Vector2( cx, 1 - cz ),
 					        new Vector2( dx, 1 - dz )
-					});
+					};
 				} else {
-					return new List<Vector2>(new Vector2[]{
+					return new Vector2[]{
 					        new Vector2( ay, 1 - az ),
 					        new Vector2( by, 1 - bz ),
 					        new Vector2( cy, 1 - cz ),
 					        new Vector2( dy, 1 - dz )
-					});
+					};
 				}
 			}
 		}
 
-	}
+        //
+        public class UVGenerator : IUVGenerator
+        {
+            public float shapeWidth = 0;
+            public float shapeHeight = 0;
+
+            public UVGenerator(float shapeWidth = 1, float shapeHeight = 1)
+            {
+                this.shapeWidth = shapeWidth;
+                this.shapeHeight = shapeHeight;
+            }
+
+            public Vector2[] generateTopUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC)
+            {
+                //Debug.Log("Top: " + indexA + ", " + indexB + ", " + indexC);
+                float normalizeX = shapeWidth;
+                float normalizeY = shapeHeight;
+
+                float ax = extrudedShape.shapeVertices[indexA].x / normalizeX + 0.5f;
+                float ay = extrudedShape.shapeVertices[indexA].y / normalizeY + 0.5f;
+
+                float bx = extrudedShape.shapeVertices[indexB].x / normalizeX + 0.5f;
+                float by = extrudedShape.shapeVertices[indexB].y / normalizeY + 0.5f;
+
+                float cx = extrudedShape.shapeVertices[indexC].x / normalizeX + 0.5f;
+                float cy = extrudedShape.shapeVertices[indexC].y / normalizeY + 0.5f;
+
+                return new Vector2[]{
+                        new Vector2( ax, ay ),
+                        new Vector2( bx, by ),
+                        new Vector2( cx, cy ) };
+            }
+
+            public Vector2[] generateBottomUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC)
+            {
+                int count = geometry.vertices.Count-1;
+                indexA = count - indexA;
+                indexB = count - indexB;
+                indexC = count - indexC;
+                int shapeVCount = extrudedShape.shapeVertices.Count - 1;
+                return this.generateTopUV(geometry, extrudedShape, shapeVCount - indexA, shapeVCount - indexB, shapeVCount - indexC);
+
+                //return new Vector2[]{
+                        //new Vector2( 0, 1 ),
+                        //new Vector2( 0, 1 ),
+                        //new Vector2( 0, 1 ) };
+            }
+
+            public Vector2[] generateSideWallUV(THREE.Geometry geometry, Shape extrudedShape, List<Vector3> wallContour,
+                                             int indexA, int indexB, int indexC, int indexD, int stepIndex, int stepsLength,
+                                             int contourIndex1, int contourIndex2)
+            {
+                //Debug.Log(indexA + ", " + indexB + ", " + indexC + ", " + indexD);
+                //Debug.Log(stepIndex + " / " + stepsLength + " // " + contourIndex1 + " / " + contourIndex2 + " // " + wallContour.Count);
+
+                float l = (float)(wallContour.Count-1);
+                float x0 = (float)stepIndex / ((float)stepsLength);
+                float x1 = (float)(stepIndex+1) / ((float)stepsLength);
+                //Debug.Log((float)contourIndex1 / l + ", "+x1);
+                return new Vector2[]{
+                           new Vector2( x0, (float)contourIndex2/l ),
+                           new Vector2( x0, (float)contourIndex1/l ),
+                           new Vector2( x1, (float)contourIndex1/l ),
+                           new Vector2( x1, (float)contourIndex2/l )
+                };
+
+                //return new Vector2[]{
+                //           new Vector2( x0, 0.5f),
+                //           new Vector2( x0, 0.5f),
+                //           new Vector2( x1, 0.5f),
+                //           new Vector2( x1, 0.5f)
+                //};
+
+                // face to UV
+                //return new Vector2[]{
+                //           new Vector2( 0, 0),
+                //           new Vector2( 1, 0 ),
+                //           new Vector2( 1, 1 ),
+                //           new Vector2( 0, 1 )
+                //};
+            }
+        }
+        #endregion
+    }
 }

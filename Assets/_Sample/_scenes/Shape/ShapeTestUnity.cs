@@ -14,6 +14,7 @@ public class ShapeTestUnity : MonoBehaviour
     {
         // Triangle
         var triangleShape = ShapeUtils.CreateTriangle();
+        //var triangleShape = ShapeUtils.CreateStar();
 
         // Square
         float sqLength = 80;
@@ -56,7 +57,7 @@ public class ShapeTestUnity : MonoBehaviour
 
         addShape(triangleShape, extrudeSettings, -180, 0, 0, 0, 0, 0, 1);
         addShape(roundedRectShape, extrudeSettings, -150, 150, 0, 0, 0, 0, 1);
-        //addShape( rectShape, extrudeSettings, -150, 150, 0, 0, 0, 0, 1 );
+        addShape(rectShape, extrudeSettings, -150, 250, 0, 0, 0, 0, 1 );
         addShape(squareShape, extrudeSettings, 150, 100, 0, 0, 0, 0, 1);
         addShape(heartShape, extrudeSettings, 60, 100, 0, 0, 0, Mathf.PI, 1);
         addShape(circleShape, extrudeSettings, 120, 250, 0, 0, 0, 0, 1);
@@ -72,7 +73,7 @@ public class ShapeTestUnity : MonoBehaviour
         //Debug.LogWarning("TODO: CHECK use shape.createSpacedPointsGeometry");
         //shape.createSpacedPointsGeometry (100);
 
-        // flat shape
+        // 2d shape
         THREE.ShapeGeometry.Option op = new THREE.ShapeGeometry.Option();
         op.curveSegments = 12;
 

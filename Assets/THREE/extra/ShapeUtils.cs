@@ -171,4 +171,28 @@ public class ShapeUtils
 
         return smileyShape;
     }
+
+    public static Shape CreateStar(float innerSize = 10, float outerSize = 20, float numPts = 5)
+    {
+        List<Vector2> pts = new List<Vector2>();
+        List<Vector2> normals = new List<Vector2>();
+        //int numPts = 5;
+
+        for (int i = 0; i < numPts * 2; i++)
+        {
+            float l = i % 2 == 1 ? innerSize : outerSize;
+            float a = (float)i / numPts * Mathf.PI;
+            pts.Add(new Vector2(Mathf.Cos(a) * l, Mathf.Sin(a) * l));
+        }
+        // normal
+        for (int i = 0; i < pts.Count; i++)
+        {
+            int endI = (i == pts.Count - 1) ? 0 : i + 1;
+            Vector2 vec = pts[endI] - pts[i];
+            vec.Normalize();
+            normals.Add(new Vector2(vec.y, -vec.x));
+        }
+
+        return new Shape(pts, normals);
+    }
 }

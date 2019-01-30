@@ -8,11 +8,11 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 
 	public Material[] materials;
 
-	THREE.ExtrudeGeometry.Option extrudeSettings;
-	THREE.ClosedSplineCurve3 closedSpline;
+	ExtrudeGeometry.Option extrudeSettings;
+	ClosedSplineCurve3 closedSpline;
 
-	THREE.ExtrudeGeometry.Option extrude0Settings;
-	THREE.SplineCurve3 randomSpline;
+	ExtrudeGeometry.Option extrude0Settings;
+	SplineCurve3 randomSpline;
     
 	// Use this for initialization
 	void Start () {
@@ -21,7 +21,7 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 
 		// ---------------
 		// closed path
-		closedSpline = new THREE.ClosedSplineCurve3( new List<Vector3>(new Vector3[]{
+		closedSpline = new ClosedSplineCurve3( new List<Vector3>(new Vector3[]{
 		                                                  new Vector3( -60, -100,  60 ),
 		                                                  new Vector3( -60,   20,  60 ),
 		                                                  new Vector3( -60,  120,  60 ),
@@ -54,13 +54,13 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 			normals.Add( new Vector2 ( Mathf.Cos( a + normOffset ), Mathf.Sin( a + normOffset ) ) );
 		}
 
-		THREE.Shape shape = new THREE.Shape( pts, normals );
-		THREE.ShapeGeometry.Option op = new THREE.ShapeGeometry.Option ();
+		Shape shape = new THREE.Shape( pts, normals );
+		ShapeGeometry.Option op = new ShapeGeometry.Option ();
 		op.curveSegments = 12;
 
 		// test
-		THREE.Geometry shapeGeo;
-		shapeGeo = new THREE.ShapeGeometry (shape, op);
+		Geometry shapeGeo;
+		shapeGeo = new ShapeGeometry (shape, op);
 		AddRenderObject(shapeGeo, materials[0], Vector3.zero);
         
 		testGeometry = new THREE.ExtrudeGeometry(new List<THREE.Shape>(new THREE.Shape[]{ shape }), extrudeSettings );
@@ -90,32 +90,16 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		extrude0Settings.bevelEnabled = false;
 		extrude0Settings.extrudePath = randomSpline;
 
-		// star path
-		List<Vector2> pts0 = new List<Vector2>();
-		List<Vector2> normals0 = new List<Vector2>();
-		int numPts = 5;
-        
-		for ( int i = 0; i < numPts * 2; i ++ ) {
-			int l = i % 2 == 1 ? 10 : 20;
-			float a = (float)i / numPts * Mathf.PI;
-			pts0.Add( new Vector2 ( Mathf.Cos( a ) * l, Mathf.Sin( a ) * l ) );
-		}
-		for ( int i = 0; i < pts0.Count; i ++ ) {
-			int endI = (i == pts0.Count-1) ? 0 : i+1;
-			Vector2 vec = pts0[endI] - pts0[i];
-			vec.Normalize();
-			normals0.Add( new Vector2 ( vec.y, -vec.x ) );
-		}
-		
-		Shape startShape = new Shape( pts0, normals0 );
-		testGeometry = new THREE.ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude0Settings );
+        // star path
+        Shape startShape = ShapeUtils.CreateStar();
+		testGeometry = new ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude0Settings );
 		//testGeometry.computeVertexNormals();
 		
 		AddRenderObject(testGeometry, materials[1], Vector3.zero);
 
 
 		// star Extrude
-		THREE.ExtrudeGeometry.Option extrude1Settings  = new THREE.ExtrudeGeometry.Option();
+		ExtrudeGeometry.Option extrude1Settings  = new THREE.ExtrudeGeometry.Option();
 		extrude1Settings.amount = 20;
 		extrude1Settings.steps = 2;
 		extrude1Settings.bevelEnabled = true;
@@ -123,17 +107,16 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		extrude1Settings.bevelSize = 1;
 		extrude1Settings.bevelSegments = 1;
 
-		testGeometry = new THREE.ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude1Settings );
-
+		testGeometry = new ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude1Settings );
 		AddRenderObject(testGeometry, materials[2], new Vector3(50, 100, 50 ), 0.0f);
 
 		// test
-		THREE.Geometry startShapeGeo;
-		startShapeGeo = new THREE.ShapeGeometry (startShape, op);
+		Geometry startShapeGeo;
+		startShapeGeo = new ShapeGeometry (startShape, op);
 		AddRenderObject(startShapeGeo, materials[0], Vector3.zero);
 	}
 
-	THREE.Geometry AddRenderObject(THREE.Geometry geo, Material material, Vector3 position, float smooth = 0.0f)
+	Geometry AddRenderObject(Geometry geo, Material material, Vector3 position, float smooth = 0.0f)
 	{
 		UnityEngine.Mesh mesh = geo.GetMesh(smooth);
 

@@ -15,30 +15,18 @@ using System.Collections.Generic;
 
 namespace THREE
 {
-//public class Hole : CurvePath
-	public class Hole : Path
-	{
-
-	}
-
-	public class ShapeAndHoleObject
-	{
-		public Shape baseShape;
-
-		public List<Vector3> shapeVertices;
-		public List<List<Vector3>> holes;
-		public bool reverse;
-	}
 
 	public class Shape : Path
 	{
-		//public List<Hole> holes;
 		public List<CurvePath> holes;
+        public List<Vector2> normals;
 
-		public List<Vector2> normals;
+        public List<Vector3> shapeVertices;
+        public List<List<Vector3>> holesList;
 
-		public Shape (List<Vector2> points, List<Vector2> normals = null) : base( points )
-	//public Shape (List<Vector3> points)
+        public bool reverse;
+
+        public Shape (List<Vector2> points, List<Vector2> normals = null) : base( points )
 		{
 			this.holes = new List<CurvePath> ();
 
@@ -52,22 +40,19 @@ namespace THREE
 			holes = new List<CurvePath> ();
 		}
 
-		// Convenience method to return ExtrudeGeometry
-	
-		THREE.ExtrudeGeometry extrude (THREE.ExtrudeGeometry.Option options)
-		{
-			THREE.ExtrudeGeometry extruded = new THREE.ExtrudeGeometry (new List<Shape> (new Shape[]{ this }), options);
-			return extruded;
-		}
+		//// Convenience method to return ExtrudeGeometry
+		//THREE.ExtrudeGeometry extrude (THREE.ExtrudeGeometry.Option options)
+		//{
+		//	THREE.ExtrudeGeometry extruded = new THREE.ExtrudeGeometry (new List<Shape> (new Shape[]{ this }), options);
+		//	return extruded;
+		//}
 
-		// Convenience method to return ShapeGeometry
-	
-		THREE.ShapeGeometry makeGeometry (THREE.ShapeGeometry.Option options)
-		{
-		
-			var geometry = new THREE.ShapeGeometry (new List<Shape> (new Shape[]{ this }), options);
-			return geometry;
-		}
+		//// Convenience method to return ShapeGeometry
+		//THREE.ShapeGeometry makeGeometry (THREE.ShapeGeometry.Option options)
+		//{
+		//	var geometry = new THREE.ShapeGeometry (new List<Shape> (new Shape[]{ this }), options);
+		//	return geometry;
+		//}
 
 		// Get points of holes
 
@@ -100,43 +85,26 @@ namespace THREE
 		}
 
 		// Get points of shape and holes (keypoints based on segments parameter)
-	
-		ShapeAndHoleObject extractAllPoints (float divisions)
+		void extractAllPoints (float divisions)
 		{
-			ShapeAndHoleObject obj = new ShapeAndHoleObject ();
-			obj.shapeVertices = this.getTransformedPoints (divisions, null);
-			obj.holes = this.getPointsHoles (divisions);
-
-			return obj;
-//		return {
-//			shape: this.getTransformedPoints( divisions ),
-//			holes: this.getPointsHoles( divisions )		
-//		}
+			shapeVertices = this.getTransformedPoints (divisions, null);
+			holesList = this.getPointsHoles (divisions);
 		}
 	
-		public ShapeAndHoleObject extractPoints (float divisions)
+		public void extractPoints (float divisions)
 		{
-			if (this.useSpacedPoints) {
-				return this.extractAllSpacedPoints (divisions);
-			}
-			return this.extractAllPoints (divisions);
+            if (this.useSpacedPoints) {
+                this.extractAllSpacedPoints(divisions);
+            } else {
+                this.extractAllPoints(divisions);
+            }
 		}
 
 		// Get points of shape and holes (spaced by regular distance)
-	
-		ShapeAndHoleObject extractAllSpacedPoints (float divisions)
+		void extractAllSpacedPoints (float divisions)
 		{
-			ShapeAndHoleObject obj = new ShapeAndHoleObject ();
-			obj.shapeVertices = this.getTransformedSpacedPoints (divisions, null);
-			obj.holes = this.getSpacedPointsHoles (divisions);
-
-			return obj;
-//		return {
-//			
-//			shape: this.getTransformedSpacedPoints( divisions ),
-//			holes: this.getSpacedPointsHoles( divisions )
-//				
-//		}
+			shapeVertices = this.getTransformedSpacedPoints (divisions, null);
+			holesList = this.getSpacedPointsHoles (divisions);
 		}
 
 		/**************************************************************

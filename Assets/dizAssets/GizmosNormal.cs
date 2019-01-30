@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GizmosNormal : MonoBehaviour {
 
-	[SerializeField] float amp = 0.1f;
+	[SerializeField] float amp = 1.5f;
     [SerializeField] Color color = Color.red;
 
     private void OnDrawGizmosSelected()

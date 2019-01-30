@@ -8,9 +8,9 @@ public class ExtrudeTestUnityMeshLine : MonoBehaviour {
 
 	public Material material;
 
-	THREE.ExtrudeGeometry.Option extrudeSettings;
-    THREE.SplineCurve3 randomSpline;
-    THREE.Curve debug_line;
+	ExtrudeGeometry.Option extrudeSettings;
+    SplineCurve3 randomSpline;
+    Curve debug_line;
 
     List<Vector3> randomPoints;
 
@@ -28,11 +28,6 @@ public class ExtrudeTestUnityMeshLine : MonoBehaviour {
         int count = 100;
         float delta = 1f / count;
         for ( int i = 0; i < count; i ++ ) {
-			//randomPoints.Add( new Vector3( ( i - 4.5f ) * 50, Random.Range( - 50.0f, 50.0f ), Random.Range( - 50.0f, 50.0f ) ) );
-			//randomPoints.Add( new Vector3( ( i ) * 50, Random.Range( - 50.0f, 50.0f ), Random.Range( - 50.0f, 50.0f ) ) );
-			//randomPoints.Add( new Vector3( i * 50, i, i*2 ) );
-
-            //randomPoints.Add(new Vector3((delta * i) * 500, 100 * curveY.Evaluate(delta * i), 100 * curveZ.Evaluate(delta * i)));
             randomPoints.Add(new Vector3( 500 * curveX.Evaluate(delta * i), 500 * curveY.Evaluate(delta * i), 100 * curveZ.Evaluate(delta * i) ));
 
 		}
@@ -118,7 +113,6 @@ public class ExtrudeTestUnityMeshLine : MonoBehaviour {
 	}
 
     [SerializeField] bool gizmo = false;
-
 	void OnDrawGizmos()
 	{
         if (!gizmo) { return; }

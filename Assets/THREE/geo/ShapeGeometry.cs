@@ -24,7 +24,7 @@ namespace THREE
 		public class Option{
 			public int curveSegments = 12;
 			//public Material material;
-			public ExtrudeGeometry.WorldUVGenerator UVGenerator;
+			public ExtrudeGeometry.IUVGenerator UVGenerator;
 		}
 		
 		public BoundingBox shapebb;
@@ -34,7 +34,7 @@ namespace THREE
 			this.shapebb = shapes[ shapes.Count - 1 ].getBoundingBox();
 			this.addShapeList( shapes, options );
 
-            this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
+            //this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
         }
 
 		public ShapeGeometry(Shape shape, Option options ){
@@ -42,7 +42,7 @@ namespace THREE
 			this.shapebb = shape.getBoundingBox();
 			this.addShape( shape, options );
 
-            this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
+            //this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
         }
 
 		/**
@@ -66,7 +66,7 @@ namespace THREE
 			
 			//Material material = options.material;
 			//var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
-			ExtrudeGeometry.WorldUVGenerator uvgen = options.UVGenerator;
+			ExtrudeGeometry.IUVGenerator uvgen = options.UVGenerator;
 			if(uvgen == null){
 				uvgen = new ExtrudeGeometry.WorldUVGenerator();
 			}
@@ -77,10 +77,10 @@ namespace THREE
 			int i, l;
 			
 			int shapesOffset = this.vertices.Count;
-			ShapeAndHoleObject shapePoints = shape.extractPoints( curveSegments );
+			shape.extractPoints( curveSegments );
 			
-			List<Vector3> vertices = shapePoints.shapeVertices;
-			List<List<Vector3>> holes = shapePoints.holes;
+			List<Vector3> vertices = shape.shapeVertices;
+			List<List<Vector3>> holes = shape.holesList;
 			
 			bool reverse = !Shape.UtilsShape.isClockWise( vertices );
 			
@@ -143,7 +143,7 @@ namespace THREE
 				int c = face[2] + shapesOffset;
 
 				Face3 f = new Face3( a, b, c );
-				f.uvs = uvgen.generateBottomUV( this, shape, a, b, c ).ToArray();
+				f.uvs = uvgen.generateBottomUV( this, shape, a, b, c );
 				this.faces.Add(f);
 
 				//this.faceVertexUvs.Add( new List<Vector2>( new Vector2[]{ new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f) })); // debug

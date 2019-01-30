@@ -9,6 +9,7 @@ public class CreateBase : MonoBehaviour {
     [SerializeField] MeshFilter meshFilter;
 
     [SerializeField] bool isFlatNormals = false;
+    [SerializeField] bool isDoubleSided = false;
     protected Geometry geo;
     
     void OnValidate() {
@@ -19,7 +20,9 @@ public class CreateBase : MonoBehaviour {
         if (isFlatNormals) {
             geo.SetFaceNormals();
         }
-
+        if (isDoubleSided) {
+            geo.SetDoubleSided();
+        }
         // set mesh
         if (meshFilter == null){
             meshFilter = this.gameObject.GetComponent<MeshFilter>();

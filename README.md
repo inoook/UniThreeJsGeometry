@@ -10,7 +10,7 @@ http://threejs.org/examples/#webgl_geometries
 
 http://threejs.org/examples/#webgl_geometries2
 
-あたりを、Unityでもつかえるようにしている。
+あたりを、Unityで使えるように。
 
 ~~~cs
 Geometry geo = new CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, per);

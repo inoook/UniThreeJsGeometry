@@ -51,25 +51,17 @@ public class ExtrudeTestUnityMeshAnim : MonoBehaviour {
 		}
 
         SplineCurve3 randomSpline =  new SplineCurve3( randomPoints );
-		List<Vector3> extrudePts = randomSpline.getSpacedPoints( step );
-		for(int i = 0; i < extrudePts.Count; i++){
-			Vector3 pt = extrudePts[i];
-			Debug.DrawRay(pt, Vector3.one* 2.0f, Color.yellow);
-		}
-
-//		extrudeSettings = new THREE.ExtrudeGeometry.Option();
 		extrudeSettings.steps = step;
 
         extrudeSettings.bevelEnabled = false;
 		extrudeSettings.extrudePath = randomSpline;
-		extrudeSettings.frames = new THREE.TubeGeometry.FrenetFrames(randomSpline, step, false);
+		extrudeSettings.frames = new FrenetFrames(randomSpline, step, false);
         extrudeSettings.uvGenerator = new ExtrudeGeometry.UVGenerator(40, 40);
 
-        //THREE.Geometry extrudeGeo = new THREE.ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrudeSettings );
         // update shape
-        extrudeGeo.UpdateShape(startShape, extrudeSettings);
+        extrudeGeo = new ExtrudeGeometry( startShape, extrudeSettings );
 
-		UnityEngine.Mesh mesh = extrudeGeo.CreateAndGetMesh();
+		UnityEngine.Mesh mesh = extrudeGeo.CreateMesh();
 		meshFilter.mesh = mesh;
 
         //Debug.LogError("XXX");

@@ -11,7 +11,7 @@ public class GizmosNormal : MonoBehaviour {
         MeshFilter mf = this.gameObject.GetComponent<MeshFilter>();
         if(mf == null) { return; }
 
-        Mesh mesh = mf.mesh;
+        Mesh mesh = mf.sharedMesh;
         Vector3[] normals = mesh.normals;
         Vector3[] vertices = mesh.vertices;
 

@@ -23,10 +23,7 @@ namespace THREE
 		public float maxZ;
 	}
 
-	public class Bend : Curve
-	{
-
-	}
+	public class Bend : Curve { }
 
 	public class CurvePath : Curve
 	{
@@ -78,7 +75,6 @@ namespace THREE
 		// 4. Return curve.getPointAt(t')
 		public override Vector3 getPoint (float t)
 		{
-		
 			float d = t * this.getLength ();
 			List<float> curveLengths = this.getCurveLengths ();
 			int i = 0;
@@ -133,11 +129,8 @@ namespace THREE
 		{
 		
 			// We use cache values if curves and cache array are same length
-		
 			if (this.cacheLengths != null && this.cacheLengths.Count == this.curves.Count) { // TODO: CHECK/////////
-			
 				return this.cacheLengths;
-			
 			}
 			;
 		
@@ -149,10 +142,8 @@ namespace THREE
 			int i, il = this.curves.Count;
 		
 			for (i = 0; i < il; i ++) {
-			
 				sums += this.curves [i].getLength ();
 				lengths.Add (sums);
-			
 			}
 		
 			this.cacheLengths = lengths;
@@ -162,7 +153,6 @@ namespace THREE
 		}
 
 		// Returns min and max coordinates
-	
 		public BoundingBox getBoundingBox ()
 		{
 		

@@ -12,13 +12,30 @@ using System.Collections.Generic;
 namespace THREE{
 	public class UVsUtils {
 
-		public class CylinderUVGenerator
+        // TODO: 処理のチェック
+		public class CylinderUVGenerator : ExtrudeGeometry.IUVGenerator
 		{
 			int uRepeat = 1;
 			Geometry targetGeometry = null;
 			List<float> lengthCache = null;
 
-			public List<Vector2> generateSideWallUV(Geometry geometry, Shape extrudedShape, List<Vector3> wallContour, ExtrudeGeometry.Option extrudeOptions,
+            public Vector2[] generateTopUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC) {
+
+                return new Vector2[]{
+                new Vector2( 0, 1 ),
+                new Vector2( 0, 1 ),
+                new Vector2( 0, 1 ) };
+            }
+
+            public Vector2[] generateBottomUV(THREE.Geometry geometry, Shape extrudedShape, int indexA, int indexB, int indexC) {
+   
+                return new Vector2[]{
+                new Vector2( 0, 1 ),
+                new Vector2( 0, 1 ),
+                new Vector2( 0, 1 ) };
+            }
+
+            public Vector2[] generateSideWallUV(Geometry geometry, Shape extrudedShape, List<Vector3> wallContour,
 			                            int indexA, int indexB, int indexC, int indexD, int stepIndex, int stepsLength,
 			                             int contourIndex1, int contourIndex2 ) {
 				// first call
@@ -37,13 +54,13 @@ namespace THREE{
 				
 				u1 *= this.uRepeat;
 				u2 *= this.uRepeat;
-				return new List<Vector2>(new Vector2[]{
-				        new Vector2( u1, v1 ),
-				        new Vector2( u2, v1 ),
-				        new Vector2( u2, v2 ),
-				        new Vector2( u1, v2 )
-				});
-			}
+                return new Vector2[]{
+                        new Vector2( u1, v1 ),
+                        new Vector2( u2, v1 ),
+                        new Vector2( u2, v2 ),
+                        new Vector2( u1, v2 )
+                };
+            }
 
 			void prepare(Geometry geometry, List<Vector3> wallContour) {
 				Vector3 p1, p2;

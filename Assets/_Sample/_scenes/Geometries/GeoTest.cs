@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 // http://threejs.org/examples/#webgl_geometries
-public class GeoTestUnity : MonoBehaviour {
+public class GeoTest : MonoBehaviour {
 
 	public Material material;
 	public Material wireMaterial;

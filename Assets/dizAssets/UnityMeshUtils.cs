@@ -92,4 +92,135 @@ public class UnityMeshUtils {
 		}
 		mesh.normals = normals;
 	}
+
+    // http://norio.hatenadiary.jp/entry/2017/01/23/081937
+    // スムージング角を用いて法線の再計算を行う
+    public static void RecalculateNormals(Mesh mesh, float angle)
+    {
+        var triangles = mesh.triangles;
+        var vertices = mesh.vertices;
+        var triNormals = new Vector3[triangles.Length / 3];
+        var normals = new Vector3[vertices.Length];
+
+        angle = angle * Mathf.Deg2Rad;
+
+        var dictionary = new Dictionary<VertexKey, VertexEntry>(vertices.Length);
+
+        for (var i = 0; i < triangles.Length; i += 3)
+        {
+            var i1 = triangles[i];
+            var i2 = triangles[i + 1];
+            var i3 = triangles[i + 2];
+
+            var p1 = vertices[i2] - vertices[i1];
+            var p2 = vertices[i3] - vertices[i1];
+            var normal = Vector3.Cross(p1, p2).normalized;
+            int triIndex = i / 3;
+            triNormals[triIndex] = normal;
+
+            VertexEntry entry;
+            VertexKey key;
+
+            if (!dictionary.TryGetValue(key = new VertexKey(vertices[i1]), out entry))
+            {
+                entry = new VertexEntry();
+                dictionary.Add(key, entry);
+            }
+            entry.Add(i1, triIndex);
+
+            if (!dictionary.TryGetValue(key = new VertexKey(vertices[i2]), out entry))
+            {
+                entry = new VertexEntry();
+                dictionary.Add(key, entry);
+            }
+            entry.Add(i2, triIndex);
+
+            if (!dictionary.TryGetValue(key = new VertexKey(vertices[i3]), out entry))
+            {
+                entry = new VertexEntry();
+                dictionary.Add(key, entry);
+            }
+            entry.Add(i3, triIndex);
+        }
+        foreach (var value in dictionary.Values)
+        {
+            for (var i = 0; i < value.Count; ++i)
+            {
+                var sum = new Vector3();
+                for (var j = 0; j < value.Count; ++j)
+                {
+                    if (value.VertexIndex[i] == value.VertexIndex[j])
+                    {
+                        sum += triNormals[value.TriangleIndex[j]];
+                    }
+                    else
+                    {
+                        float dot = Vector3.Dot(
+                            triNormals[value.TriangleIndex[i]],
+                            triNormals[value.TriangleIndex[j]]);
+                        dot = Mathf.Clamp(dot, -0.99999f, 0.99999f);
+                        float acos = Mathf.Acos(dot);
+                        if (acos <= angle)
+                        {
+                            sum += triNormals[value.TriangleIndex[j]];
+                        }
+                    }
+                }
+
+                normals[value.VertexIndex[i]] = sum.normalized;
+            }
+        }
+
+        mesh.normals = normals;
+    }
+
+    private struct VertexKey
+    {
+        private readonly long x;
+        private readonly long y;
+        private readonly long z;
+
+        private const int Tolerance = 100000;
+
+        public VertexKey(Vector3 position)
+        {
+            x = (long)(Mathf.Round(position.x * Tolerance));
+            y = (long)(Mathf.Round(position.y * Tolerance));
+            z = (long)(Mathf.Round(position.z * Tolerance));
+        }
+
+        public override bool Equals(object obj)
+        {
+            var key = (VertexKey)obj;
+            return x == key.x && y == key.y && z == key.z;
+        }
+
+        public override int GetHashCode()
+        {
+            return (x * 7 ^ y * 13 ^ z * 27).GetHashCode();
+        }
+    }
+
+    private sealed class VertexEntry
+    {
+        public int[] TriangleIndex = new int[4];
+        public int[] VertexIndex = new int[4];
+
+        private int reserved = 4;
+
+        public int Count { get; private set; }
+
+        public void Add(int vertIndex, int triIndex)
+        {
+            if (reserved == Count)
+            {
+                reserved *= 2;
+                System.Array.Resize(ref TriangleIndex, reserved);
+                System.Array.Resize(ref VertexIndex, reserved);
+            }
+            TriangleIndex[Count] = triIndex;
+            VertexIndex[Count] = vertIndex;
+            ++Count;
+        }
+    }
 }

@@ -254,7 +254,6 @@ namespace THREE
 	
 		public virtual Vector3 getTangent (float t)
 		{
-		
 			float delta = THREE.Setting.EPSILON_S;
 			float t1 = t - delta;
 			float t2 = t + delta;
@@ -278,7 +277,6 @@ namespace THREE
 		{
 			float t = this.getUtoTmapping (u);
 			return this.getTangent (t);
-		
 		}
 
 

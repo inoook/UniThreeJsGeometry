@@ -14,19 +14,19 @@ namespace THREE
 {
 	public class PolyhedronGeometry : Geometry
 	{
-
-		//float radius;
-		//int detail;
 		public List<THREEVector3> t_vertices;
 		THREEVector3 centroid;
 
-		public void PolyhedronGeometryBuild (List<float> vertices, List<int> indices, float radius = 1, int detail = 0)
+        public PolyhedronGeometry(List<float> vertices, List<int> indices, float radius = 1, int detail = 0)
+        {
+            PolyhedronGeometryBuild(vertices, indices, radius, detail);
+        }
+        public PolyhedronGeometry() {  }
+
+        public void PolyhedronGeometryBuild (List<float> vertices, List<int> indices, float radius = 1, int detail = 0)
 		{
 			t_vertices = new List<THREEVector3> ();
 		
-			//this.radius = radius;
-			//this.detail = detail;
-
 			for (int i = 0, l = vertices.Count; i < l; i += 3) {
 				prepare (new THREEVector3 (vertices [i], vertices [i + 1], vertices [i + 2]));
 				// this.t_vertices に要素が追加される

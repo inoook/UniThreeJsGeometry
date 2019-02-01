@@ -37,14 +37,13 @@ namespace THREE
 	{
 
 		public List<PAction> actions;
-		public List<Vector3> pointList;
+		public List<Vector2> pointList;
 		public bool useSpacedPoints = false;
 
 		public Path (List<Vector2> points = null)
 		{
-
 			this.actions = new List<PAction> ();
-			pointList = new List<Vector3> ();
+			pointList = new List<Vector2> ();
 		
 			if (points != null) {
 				this.fromPoints (points);
@@ -54,10 +53,8 @@ namespace THREE
 		// TODO Clean up PATH API
 		// Create path using straight lines to connect all points
 		// - vectors: array of Vector2
-	
 		void fromPoints (List<Vector2> vectors)
 		{
-		
 			this.moveTo (vectors [0].x, vectors [0].y);
 			for (int v = 1, vlen = vectors.Count; v < vlen; v ++) {
 				this.lineTo (vectors [v].x, vectors [v].y);
@@ -67,7 +64,6 @@ namespace THREE
 	
 		public void moveTo (float x, float y)
 		{
-		
 			//var args = Array.prototype.slice.call( arguments );
 			PAction act = new PAction (PathActions.MOVE_TO, new List<float> (new float[] {
 				x,
@@ -75,12 +71,12 @@ namespace THREE
 			}));
 			this.actions.Add (act);
 
+            //this.pointList.Add(new Vector2(x, y));
 			//this.actions.Add( { action: THREE.PathActions.MOVE_TO, args: args } );	
 		}
 
 		public void lineTo (float x, float y)
 		{
-		
 			//var args = Array.prototype.slice.call( arguments );
 		
 			List<float> lastargs = this.actions [this.actions.Count - 1].args;
@@ -100,11 +96,6 @@ namespace THREE
 
 		public void quadraticCurveTo (float aCPx, float aCPy, float aX, float aY)
 		{
-
-//		Vector3 lastPoint = pointList[ this.pointList.Count - 1 ];
-//		float x0 = lastPoint.x;
-//		float y0 = lastPoint.y;
-
 			List<float> lastargs = this.actions [this.actions.Count - 1].args;
 		
 			float x0 = lastargs [lastargs.Count - 2];
@@ -130,11 +121,6 @@ namespace THREE
 	                   float aCP2x, float aCP2y,
 	                   float aX, float aY)
 		{
-			/*
-		Vector3 lastPoint = pointList[ this.pointList.Count - 1 ];
-		float x0 = lastPoint.x;
-		float y0 = lastPoint.y;
-		*/
 			List<float> lastargs = this.actions [this.actions.Count - 1].args;
 		
 			float x0 = lastargs [lastargs.Count - 2];
@@ -163,7 +149,7 @@ namespace THREE
 		public void arc (float aX, float aY, float aRadius, float aStartAngle, float aEndAngle, bool aClockwise)
 		{
 		
-			Vector3 lastPoint = pointList [this.pointList.Count - 1];
+			Vector2 lastPoint = pointList [this.pointList.Count - 1];
 			float x0 = lastPoint.x;
 			float y0 = lastPoint.y;
 		
@@ -174,19 +160,17 @@ namespace THREE
 
 		public void absarc (float aX, float aY, float aRadius, float aStartAngle, float aEndAngle, bool aClockwise)
 		{
+            this.moveTo(aX+aRadius, aY);
 			this.absellipse (aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
 		}
 
 		public void ellipse (float aX, float aY, float xRadius, float yRadius, float aStartAngle, float aEndAngle, bool aClockwise)
 		{
-		
-			Vector3 lastPoint = pointList [this.pointList.Count - 1];
-			float x0 = lastPoint.x;
-			float y0 = lastPoint.y;
-		
-			this.absellipse (aX + x0, aY + y0, xRadius, yRadius,
-		                aStartAngle, aEndAngle, aClockwise);
-		
+            Vector2 lastPoint = pointList [this.pointList.Count - 1];
+            float x0 = lastPoint.x;
+            float y0 = lastPoint.y;
+
+            this.absellipse (aX - x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise);
 		}
 
 		public void absellipse (float aX, float aY, float xRadius, float yRadius, float aStartAngle, float aEndAngle, bool aClockwise)
@@ -199,12 +183,12 @@ namespace THREE
 			Vector3 lastPoint = curve.getPoint (1.0f);
 			float lastX = lastPoint.x;
 			float lastY = lastPoint.y;
-			//args.push(lastPoint.x);
-			//args.push(lastPoint.y);
-		
-			//this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
-			PAction act = new PAction (PathActions.ELLIPSE, new List<float> (new float[] {
-				aX,
+            //args.push(lastPoint.x);
+            //args.push(lastPoint.y);
+
+            //this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
+            PAction act = new PAction (PathActions.ELLIPSE, new List<float> (new float[] {
+                aX,
 				aY,
 				xRadius,
 				yRadius,
@@ -220,14 +204,10 @@ namespace THREE
 
 		public override List<Vector3> getSpacedPoints (float divisions = 40, bool closedPath = true)
 		{
-
 			List<Vector3> points = new List<Vector3> ();
 		
 			for (int i = 0; i < divisions; i ++) {
-			
 				points.Add (this.getPoint ((float)i / divisions));
-			
-				//if( !this.getPoint( i / divisions ) ) throw "DIE";
 			}
 		
 			// if ( closedPath ) {
@@ -244,7 +224,6 @@ namespace THREE
 		public override List<Vector3> getPoints (float divisions = 12, bool closedPath = true)
 		{
 			if (this.useSpacedPoints) {
-				Debug.Log ("tata");
 				return this.getSpacedPoints (divisions, closedPath);
 			}
 		
@@ -449,26 +428,22 @@ namespace THREE
 
 		void ELLIPSE (List<float> args, float divisions, List<Vector3> points, bool aClockwise)
 		{
-			//Debug.Log("ELLIPSE> "+ divisions);
 			float aX = args [0], aY = args [1],
 			xRadius = args [2],
 			yRadius = args [3],
 			aStartAngle = args [4], aEndAngle = args [5];
-			//aClockwise = args[ 6 ];
-		
-		
+            //aClockwise = args[ 6 ];
+
 			float deltaAngle = aEndAngle - aStartAngle;
 			float angle;
 			float tdivisions = divisions * 2.0f;
-		
-			for (int j = 1; j <= tdivisions; j ++) {
+
+            for (int j = 1; j <= tdivisions; j++) {
 			
 				float t = (float)j / tdivisions;
 			
 				if (! aClockwise) {
-				
 					t = 1.0f - t;
-				
 				}
 			
 				angle = aStartAngle + t * deltaAngle;

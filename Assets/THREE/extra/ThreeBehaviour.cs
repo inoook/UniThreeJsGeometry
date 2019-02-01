@@ -26,7 +26,7 @@ namespace THREE
 		{
 			this.geo = geo;
 			this.mat = mat;
-			this.geo.CreateAndGetMesh ();
+			this.geo.CreateMesh ();
 		}
 
 		public override UnityEngine.Mesh GetMesh ()

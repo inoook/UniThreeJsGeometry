@@ -9,8 +9,6 @@ public class ExtrudeTestUnityMeshSubmesh : MonoBehaviour {
 	public Material[] materials;
 
 
-
-
 	// Use this for initialization
 	void Start () {
 
@@ -50,9 +48,9 @@ public class ExtrudeTestUnityMeshSubmesh : MonoBehaviour {
             _normals.Add(new Vector2(Mathf.Cos(a + normOffset), Mathf.Sin(a + normOffset)));
         }
 
-        THREE.Shape shape = new THREE.Shape(pts, _normals);
+        Shape shape = new Shape(pts, _normals);
 
-        testGeometry = new THREE.ExtrudeGeometry(new List<THREE.Shape>(new THREE.Shape[]{ shape }), extrudeSettings );
+        testGeometry = new ExtrudeGeometry( shape, extrudeSettings );
 		//testGeometry.computeVertexNormals();
 		
 		UnityEngine.Mesh mesh0 = testGeometry.GetMesh(meshSmooth);
@@ -95,7 +93,7 @@ public class ExtrudeTestUnityMeshSubmesh : MonoBehaviour {
 
         Shape startShape = new Shape(pts0, normals0);
 
-		testGeometry = new THREE.ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude0Settings );
+		testGeometry = new ExtrudeGeometry( startShape, extrude0Settings );
 
 		UnityEngine.Mesh mesh1 = testGeometry.GetMesh(meshSmooth);
 		vertices.AddRange(mesh1.vertices);
@@ -103,7 +101,7 @@ public class ExtrudeTestUnityMeshSubmesh : MonoBehaviour {
 		uvs.AddRange(mesh1.uv);
 
 //		//
-		THREE.ExtrudeGeometry.Option extrude1Settings  = new THREE.ExtrudeGeometry.Option();
+		THREE.ExtrudeGeometry.Option extrude1Settings  = new ExtrudeGeometry.Option();
 		extrude1Settings.amount = 20;
 		extrude1Settings.steps = 1;
 		extrude1Settings.bevelEnabled = false;
@@ -111,7 +109,7 @@ public class ExtrudeTestUnityMeshSubmesh : MonoBehaviour {
 		extrude1Settings.bevelSize = 4;
 		extrude1Settings.bevelSegments = 1;
 
-		testGeometry = new THREE.ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude1Settings );
+		testGeometry = new THREE.ExtrudeGeometry( startShape, extrude1Settings );
 		
 		UnityEngine.Mesh mesh2 = testGeometry.GetMesh(meshSmooth);
 		vertices.AddRange(mesh2.vertices);

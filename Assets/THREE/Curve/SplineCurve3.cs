@@ -11,7 +11,6 @@ namespace THREE
 	
 		public SplineCurve3 (List<Vector3> points)
 		{
-		
 			this.points = (points == null) ? new List<Vector3> () : points;
 		}
 

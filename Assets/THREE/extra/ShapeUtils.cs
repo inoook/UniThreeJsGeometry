@@ -7,7 +7,7 @@ public class ShapeUtils
 {
     public static Shape CreateTriangle(Vector2 a, Vector2 b, Vector2 c)
     {
-        var triangleShape = new THREE.Shape();
+        var triangleShape = new Shape();
         triangleShape.moveTo(a.x, a.y);
         triangleShape.lineTo(b.x, b.y);
         triangleShape.lineTo(c.x, c.y);
@@ -23,7 +23,7 @@ public class ShapeUtils
 
     public static Shape CreateSquare(float sqLength)
     {
-        var squareShape = new THREE.Shape();
+        var squareShape = new Shape();
         squareShape.moveTo(0, 0);
         squareShape.lineTo(0, sqLength);
         squareShape.lineTo(sqLength, sqLength);
@@ -35,7 +35,7 @@ public class ShapeUtils
 
     public static Shape CreateRectangle(float rectLength = 120, float rectWidth = 40)
     {
-        var rectShape = new THREE.Shape();
+        var rectShape = new Shape();
         rectShape.moveTo(0, 0);
         rectShape.lineTo(0, rectWidth);
         rectShape.lineTo(rectLength, rectWidth);
@@ -49,7 +49,7 @@ public class ShapeUtils
     {
         var x = 0;
         var y = 0;
-        var roundedRectShape = new THREE.Shape();
+        var roundedRectShape = new Shape();
 
         roundedRectShape.moveTo(x, y + radius );
         roundedRectShape.lineTo(x, y + height - radius );
@@ -83,7 +83,7 @@ public class ShapeUtils
 
     public static Shape CreateCircle(float circleRadius)
     {
-        var circleShape = new THREE.Shape();
+        var circleShape = new Shape();
         circleShape.moveTo(0, circleRadius);
         circleShape.quadraticCurveTo(circleRadius, circleRadius, circleRadius, 0);
         circleShape.quadraticCurveTo(circleRadius, -circleRadius, 0, -circleRadius);
@@ -93,11 +93,9 @@ public class ShapeUtils
         return circleShape;
     }
 
-    public static Shape CreateFish()
+    public static Shape CreateFish(float x = 0, float y = 0)
     {
         Shape fishShape = new Shape();
-        float x = 0;
-        float y = 0;
         fishShape.moveTo(x, y);
         fishShape.quadraticCurveTo(x + 50, y - 80, x + 90, y - 10);
         fishShape.quadraticCurveTo(x + 100, y - 10, x + 115, y - 40);
@@ -113,46 +111,33 @@ public class ShapeUtils
         // TODO: check パラメータの内容
         float a = 10;
         Shape arcShape = new Shape();
-        arcShape.moveTo(outRadius + a, a);
         arcShape.absarc(a, a, outRadius, 0, Mathf.PI * 2.0f, false);
 
         Path holePath = new Path();
-        holePath.moveTo(inRadius + a, a);
         holePath.absarc(a, a, inRadius, 0, Mathf.PI * 2.0f, true);
-
-
-        //arcShape.moveTo(50, 10);
-        //arcShape.absarc(10, 10, 40, 0, Mathf.PI * 2.0f, false);
-
-        //Path holePath = new Path();
-        //holePath.moveTo(20, 10);
-        //holePath.absarc(10, 10, 10, 0, Mathf.PI * 2.0f, true);
 
         arcShape.holes.Add(holePath);
 
         return arcShape;
     }
 
-    public static Shape CreateASmiley()
+    public static Shape CreateSmiley()
     {
-        var smileyShape = new THREE.Shape();
-        smileyShape.moveTo(80, 40);
+        var smileyShape = new Shape();
         smileyShape.absarc(40, 40, 40, 0, Mathf.PI * 2, false);
 
-        var smileyEye1Path = new THREE.Path();
-        smileyEye1Path.moveTo(35, 20);
-        // smileyEye1Path.absarc( 25, 20, 10, 0, Math.PI*2, true );
-        smileyEye1Path.absellipse(25, 20, 10, 10, 0, Mathf.PI * 2, true);
+        var smileyEye1Path = new Path();
+        smileyEye1Path.absarc( 25, 20, 10, 0, Mathf.PI*2, true );
+        //smileyEye1Path.absellipse(25, 20, 10, 10, 0, Mathf.PI * 2, true);
 
         smileyShape.holes.Add(smileyEye1Path);
 
-        var smileyEye2Path = new THREE.Path();
-        smileyEye2Path.moveTo(65, 20);
+        var smileyEye2Path = new Path();
         smileyEye2Path.absarc(55, 20, 10, 0, Mathf.PI * 2, true);
 
         smileyShape.holes.Add(smileyEye2Path);
 
-        var smileyMouthPath = new THREE.Path();
+        var smileyMouthPath = new Path();
         // ugly box mouth
         //      smileyMouthPath.moveTo( 20, 40 );
         //      smileyMouthPath.lineTo( 60, 40 );

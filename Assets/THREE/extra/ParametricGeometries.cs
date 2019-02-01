@@ -99,9 +99,9 @@ namespace THREE
 			//int segmentsRadius;
 			//bool closed;
 
-			List<Vector3> tangents;
-			List<Vector3> normals;
-			List<Vector3> binormals;
+			Vector3[] tangents;
+            Vector3[] normals;
+            Vector3[] binormals;
 
 			int numpoints;
 
@@ -120,15 +120,15 @@ namespace THREE
 				var frames = new THREE.TubeGeometry();
 				frames.FrenetFrames(path, segments, closed);
 				*/
-				var frames = new THREE.TubeGeometry.FrenetFrames(path, segments, closed);
+				var frames = new FrenetFrames(path, segments, closed);
 				//List<Vector3> tangents = frames.tangents;
-				List<Vector3> normals = frames.normals;
-				List<Vector3> binormals = frames.binormals;
+				//List<Vector3> normals = frames.normals;
+				//List<Vector3> binormals = frames.binormals;
 				
 				// proxy internals
 				//this.tangents = tangents;
-				this.normals = normals;
-				this.binormals = binormals;
+				this.normals = frames.normals;
+				this.binormals = frames.binormals;
 
 				geo = new ParametricGeometry(paramFunc, segments, segmentsRadius);
 			}

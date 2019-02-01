@@ -43,13 +43,12 @@ public class ShapeTestUnity : MonoBehaviour
         Shape arcShape = ShapeUtils.CreateArcCircle();
 
         // Smiley
-        var smileyShape = ShapeUtils.CreateASmiley();
+        var smileyShape = ShapeUtils.CreateSmiley();
 
         // 
         THREE.ExtrudeGeometry.Option extrudeSettings = new THREE.ExtrudeGeometry.Option();
 
         extrudeSettings.amount = 40;
-        extrudeSettings.curveSegments = 10;
         extrudeSettings.bevelEnabled = true;
         extrudeSettings.bevelSegments = 3;
         extrudeSettings.bevelSize = 6.0f;
@@ -74,15 +73,14 @@ public class ShapeTestUnity : MonoBehaviour
         //shape.createSpacedPointsGeometry (100);
 
         // 2d shape
-        THREE.ShapeGeometry.Option op = new THREE.ShapeGeometry.Option();
-        op.curveSegments = 12;
+        ShapeGeometry.Option op = new ShapeGeometry.Option();
 
-        THREE.Geometry shapeGeometry = new THREE.ShapeGeometry(shape, op);
-        //geometry = new THREE.ShapeGeometry (new List<Shape> (new Shape[]{shape}), op);
+        Geometry shapeGeometry = new ShapeGeometry(shape, op);
+        shapeGeometry.SetFaceNormals();
         AddRenderObject(shapeGeometry, material, new Vector3(x, y, z - 125), new Vector3(rx, ry, rz) * Mathf.Rad2Deg);
 
         // 3d shape
-        THREE.Geometry geometry = new THREE.ExtrudeGeometry(new List<Shape>(new Shape[] { shape }), extrudeSettings);
+        Geometry geometry = new ExtrudeGeometry( shape, extrudeSettings);
 
         //threeMesh = new THREE.Mesh (geometry, material);
         //threeMesh.eulerAngles = new Vector3 (rx, ry, rz) * Mathf.Rad2Deg;
@@ -91,14 +89,18 @@ public class ShapeTestUnity : MonoBehaviour
 
     THREE.Geometry AddRenderObject(THREE.Geometry geo, Material material, Vector3 position, Vector3 angle)
     {
-        // TODO: GetMesh(30.0f)でスムージングではなく、各面ごとにcomputeFaceNormals, computeVertexNormals でスムージングできないか？
+        // TODO: GetMesh(30.0f)でスムージングではなく、各面ごと（側面と蓋面を分けて）にcomputeFaceNormals, computeVertexNormals でスムージングできないか？検討行う。
         //geo.computeFaceNormals();
         //geo.computeVertexNormals();
 
-        geo.SetFaceNormals();
+        // ここでのSmoothingの処理が重い。Unityのfbxインポートのsmoothingに似せている。綺麗になるが重い
+        //float time = Time.realtimeSinceStartup;
+        //geo.SetFaceNormals();
+        //UnityEngine.Mesh mesh = geo.GetMesh(30.0f);
+        UnityEngine.Mesh mesh = geo.GetMesh();
+        UnityMeshUtils.RecalculateNormals(mesh, 30); // 速い！
 
-        UnityEngine.Mesh mesh = geo.GetMesh(30.0f);
-
+        //Debug.Log(Time.realtimeSinceStartup - time);
         //UnityMeshUtils.MeshSmoothNormals2(mesh);
 
         position.y += -95;

@@ -11,13 +11,14 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 	ExtrudeGeometry.Option extrudeSettings;
 	ClosedSplineCurve3 closedSpline;
 
-	ExtrudeGeometry.Option extrude0Settings;
+    ExtrudeGeometry testGeometry0;
+    ExtrudeGeometry.Option extrude0Settings;
 	SplineCurve3 randomSpline;
     
 	// Use this for initialization
 	void Start () {
 
-		THREE.Geometry testGeometry;
+		Geometry testGeometry;
 
 		// ---------------
 		// closed path
@@ -29,7 +30,7 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		                                                  new Vector3(  60, -100, -60 )
 		}));
 
-//		THREE.SplineCurve3 closedSpline = new THREE.SplineCurve3( new List<Vector3>(new Vector3[]{
+//		SplineCurve3 closedSpline = new SplineCurve3( new List<Vector3>(new Vector3[]{
 //			new Vector3( 0, 0, 0 ),
 //			new Vector3( 150, 0, 0 ),
 //			new Vector3( 0, 150, 0 ),
@@ -39,9 +40,10 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		extrudeSettings.steps = 30; // 30, 100
 		extrudeSettings.bevelEnabled = false;
 		extrudeSettings.extrudePath	= closedSpline;
-		extrudeSettings.curveSegments = 4;
+        extrudeSettings.uvGenerator = new ExtrudeGeometry.UVGenerator();
+        //extrudeSettings.curveSegments = 4;
 
-		List<Vector2> pts = new List<Vector2>();
+        List<Vector2> pts = new List<Vector2>();
 		List<Vector2> normals = new List<Vector2>();
 		int count = 7;
 
@@ -54,21 +56,19 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 			normals.Add( new Vector2 ( Mathf.Cos( a + normOffset ), Mathf.Sin( a + normOffset ) ) );
 		}
 
-		Shape shape = new THREE.Shape( pts, normals );
+		Shape shape = new Shape( pts, normals );
 		ShapeGeometry.Option op = new ShapeGeometry.Option ();
-		op.curveSegments = 12;
 
 		// test
-		Geometry shapeGeo;
-		shapeGeo = new ShapeGeometry (shape, op);
+		Geometry shapeGeo = new ShapeGeometry (shape, op);
 		AddRenderObject(shapeGeo, materials[0], Vector3.zero);
         
-		testGeometry = new THREE.ExtrudeGeometry(new List<THREE.Shape>(new THREE.Shape[]{ shape }), extrudeSettings );
+		testGeometry = new ExtrudeGeometry( shape, extrudeSettings );
 		//testGeometry.computeVertexNormals();
 
-		//THREE.ShapeGeometry.Option op0 = new THREE.ShapeGeometry.Option();
+		//ShapeGeometry.Option op0 = new ShapeGeometry.Option();
 		//op0.curveSegments = 12;
-		//THREE.Geometry geometry = new THREE.ShapeGeometry(new List<Shape>( new Shape[]{shape} ), op0);
+		//Geometry geometry = new ShapeGeometry(new List<Shape>( new Shape[]{shape} ), op0);
 
 		AddRenderObject(testGeometry, materials[0], Vector3.zero);
 
@@ -85,17 +85,18 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 //		}
 		randomSpline =  new SplineCurve3( randomPoints );
 
-		extrude0Settings  = new THREE.ExtrudeGeometry.Option();
+		extrude0Settings  = new ExtrudeGeometry.Option();
 		extrude0Settings.steps = 80;// 80
 		extrude0Settings.bevelEnabled = false;
 		extrude0Settings.extrudePath = randomSpline;
 
+
         // star path
         Shape startShape = ShapeUtils.CreateStar();
-		testGeometry = new ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude0Settings );
+        testGeometry0 = new ExtrudeGeometry( startShape , extrude0Settings );
 		//testGeometry.computeVertexNormals();
 		
-		AddRenderObject(testGeometry, materials[1], Vector3.zero);
+		AddRenderObject(testGeometry0, materials[1], Vector3.zero);
 
 
 		// star Extrude
@@ -107,7 +108,7 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		extrude1Settings.bevelSize = 1;
 		extrude1Settings.bevelSegments = 1;
 
-		testGeometry = new ExtrudeGeometry( new List<Shape>(new Shape[]{ startShape }), extrude1Settings );
+		testGeometry = new ExtrudeGeometry( startShape, extrude1Settings );
 		AddRenderObject(testGeometry, materials[2], new Vector3(50, 100, 50 ), 0.0f);
 
 		// test
@@ -141,12 +142,13 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 
 		Curve spline = randomSpline;//closedSpline;
 
-//		TubeGeometry.FrenetFrames splineTube = extrudeSettings.frames;
-//
-//		int step = extrudeSettings.steps;
-//		List<Vector3> extrudePts = spline.getSpacedPoints( step );	
+        //		TubeGeometry.FrenetFrames splineTube = extrudeSettings.frames;
+        //
+        //		int step = extrudeSettings.steps;
+        //		List<Vector3> extrudePts = spline.getSpacedPoints( step );	
 
-		TubeGeometry.FrenetFrames splineTube = extrude0Settings.frames;
+        //TubeGeometry.FrenetFrames splineTube = extrude0Settings.frames;
+        FrenetFrames splineTube = testGeometry0.splineTube;
 		
 		int step = extrude0Settings.steps;
 		List<Vector3> extrudePts = spline.getSpacedPoints( step );
@@ -158,7 +160,6 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 			//Vector3 vec = splineTube.vecs[i]; // tangent
 			float u = (float)i / (step);
 			Vector3 getTan = spline.getTangentAt(u);// tangent
-
 			Vector3 tangent = splineTube.tangents[i];
 			
 			//float u = (float)i / (step - 1);

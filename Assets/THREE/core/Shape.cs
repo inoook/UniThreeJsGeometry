@@ -24,7 +24,52 @@ namespace THREE
         public List<Vector3> shapeVertices;
         public List<List<Vector3>> holesList;
 
+        public int curveSegments = 12; // カーブの再現の細かさ
+
         public bool reverse;
+
+        public static Shape Combine(Shape s0, Shape s1)
+        {
+            // TODO: メッシュの重なりで問題がある。使用非推奨。
+            s0.pointList.AddRange(s1.pointList);
+            s0.actions.AddRange(s1.actions);
+            
+            s0.extractPoints();
+            s1.extractPoints();
+
+            s0.shapeVertices.AddRange(s1.shapeVertices);
+            s0.holesList.AddRange(s1.holesList);
+
+            Shape shape = new Shape();
+            shape.shapeVertices = s0.shapeVertices;
+            shape.holesList = s0.holesList;
+            //
+            List<Vector3> ahole;
+            List<Vector3> shapeVertices = shape.shapeVertices;
+            List<List<Vector3>> holes = shape.holesList;
+
+            bool reverse = !Shape.UtilsShape.isClockWise(shapeVertices);
+            if (reverse)
+            {
+                shapeVertices.Reverse();
+
+                for (int h = 0; h < holes.Count; h++)
+                {
+                    ahole = holes[h];
+
+                    if (Shape.UtilsShape.isClockWise(ahole))
+                    {
+                        ahole.Reverse();
+                        holes[h] = ahole;
+                    }
+                }
+            }
+
+            shape.holesList = holes;
+            shape.reverse = reverse;
+
+            return shape;
+        }
 
         public Shape (List<Vector2> points, List<Vector2> normals = null) : base( points )
 		{
@@ -35,9 +80,9 @@ namespace THREE
 			}
 		}
 
-		public Shape ()
+        public Shape ()
 		{
-			holes = new List<CurvePath> ();
+			this.holes = new List<CurvePath> ();
 		}
 
 		//// Convenience method to return ExtrudeGeometry
@@ -69,10 +114,8 @@ namespace THREE
 		}
 
 		// Get points of holes (spaced by regular distance)
-	
 		List<List<Vector3>> getSpacedPointsHoles (float divisions)
 		{
-		
 			int i, il = this.holes.Count;
 			List<List<Vector3>> holesPts = new List<List<Vector3>> ();
 		
@@ -83,25 +126,46 @@ namespace THREE
 
 			return holesPts;
 		}
+        
+		public void extractPoints ()
+		{
+            float divisions = curveSegments;
 
-		// Get points of shape and holes (keypoints based on segments parameter)
-		void extractAllPoints (float divisions)
-		{
-			shapeVertices = this.getTransformedPoints (divisions, null);
-			holesList = this.getPointsHoles (divisions);
-		}
-	
-		public void extractPoints (float divisions)
-		{
             if (this.useSpacedPoints) {
-                this.extractAllSpacedPoints(divisions);
+                this.extractAllSpacedPoints(divisions);// TODO: Check 動作していない。内容確認。
             } else {
                 this.extractAllPoints(divisions);
             }
-		}
+        }
 
-		// Get points of shape and holes (spaced by regular distance)
-		void extractAllSpacedPoints (float divisions)
+        public void CalculateNormalTangents()
+        {
+            if(normals != null){
+                //Debug.Log("No CalculateNormalTangents");
+                return;
+            }
+
+            // normalが無いときに簡易的に計算
+            // TODO: もう少し綺麗に表示するアルゴリズムにする。
+            normals = new List<Vector2>();
+            for (int i = 0; i < shapeVertices.Count; i++)
+            {
+                int endI = (i == shapeVertices.Count - 1) ? 0 : i + 1;
+                Vector2 vec = shapeVertices[endI] - shapeVertices[i];
+                vec.Normalize();
+                normals.Add(new Vector2(-vec.y, vec.x));
+            }
+        }
+
+        // Get points of shape and holes (keypoints based on segments parameter)
+        void extractAllPoints(float divisions)
+        {
+            shapeVertices = this.getTransformedPoints(divisions, null);
+            holesList = this.getPointsHoles(divisions);
+        }
+
+        // Get points of shape and holes (spaced by regular distance)
+        void extractAllSpacedPoints (float divisions)
 		{
 			shapeVertices = this.getTransformedSpacedPoints (divisions, null);
 			holesList = this.getSpacedPointsHoles (divisions);
@@ -619,7 +683,7 @@ namespace THREE
 
 			public static bool isClockWise (List<Vector3> pts)
 			{
-				return THREE.FontUtils.area (pts) < 0.0f;
+				return FontUtils.area (pts) < 0.0f;
 			}
 
 			// Bezier Curves formulas obtained from

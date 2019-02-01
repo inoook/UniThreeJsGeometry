@@ -18,12 +18,12 @@ namespace THREE
 		{
 			faces = new List<Face3> ();
 			vertices = new List<Vector3> ();
-			normals = new List<Vector3> ();
+			normals = new List<Vector3>();
 
-			verticexColors = new List<Color>();
+            verticexColors = new List<Color>();
 		}
 
-		public UnityEngine.Mesh CreateAndGetMesh (float smoothAngle = 0)
+		public UnityEngine.Mesh CreateMesh (float smoothAngle = 0)
 		{
 			UnityEngine.Mesh mesh = new UnityEngine.Mesh ();
 			
@@ -198,7 +198,7 @@ namespace THREE
 		public UnityEngine.Mesh GetMesh (float smooth = 0.0f)
 		{
 			if (mesh == null) {
-				mesh = CreateAndGetMesh (smooth);
+				mesh = CreateMesh (smooth);
 			}
 			return mesh;
 		}

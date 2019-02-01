@@ -12,13 +12,8 @@ public class Notice : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-		if(Input.GetKeyDown(KeyCode.W)){
-			wireFrameRender.enabled = !wireFrameRender.enabled;
-		}
-	}
 
-	public WireFrame wireFrameRender;
+	}
 
 	private Rect rect;
 	void OnGUI()

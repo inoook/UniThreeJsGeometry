@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using THREE;
 
-public class CreateMeshCube : CreateBase {
+public class CreateBox : CreateBase {
 
     [SerializeField] float width = 10;
     [SerializeField] float height = 10;

@@ -16,5 +16,5 @@ http://threejs.org/examples/#webgl_geometries2
 Geometry geo = new CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, per);
 Geometry geo = new IcosahedronGeometry(radius, detail);
 // etc...
-meshFilter.mesh = geo.CreateAndGetMesh();
+meshFilter.mesh = geo.GetMesh();
 ~~~

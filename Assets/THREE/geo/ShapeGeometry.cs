@@ -3,15 +3,6 @@
  *
  * Creates a one-sided polygonal geometry from a path shape. Similar to
  * ExtrudeGeometry.
- *
- * parameters = {
- *
- *	curveSegments: <int>, // number of points on the curves. NOT USED AT THE MOMENT.
- *
- *	material: <int> // material index for front and back faces
- *	uvGenerator: <Object> // object that provides UV generator functions
- *
- * }
  **/
 using UnityEngine;
 using System.Collections;
@@ -22,7 +13,7 @@ namespace THREE
 	public class ShapeGeometry : Geometry {
 
 		public class Option{
-			public ExtrudeGeometry.IUVGenerator uvGenerator;
+			public IUVGenerator uvGenerator;
 		}
 		
 		public BoundingBox shapebb;
@@ -31,18 +22,41 @@ namespace THREE
 
 			this.shapebb = shapes[ shapes.Count - 1 ].getBoundingBox();
 			this.addShapeList( shapes, options );
-            //this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
         }
 
 		public ShapeGeometry(Shape shape, Option options ){
 			this.shapebb = shape.getBoundingBox();
 			this.addShape( shape, options );
-
-            //this.SetFaceNormals(); // TODO: Check 不要？　または Geometryの設定で行う様にする。
         }
+
         public ShapeGeometry(Shape shape) {
             this.shapebb = shape.getBoundingBox();
             this.addShape(shape, new Option());
+        }
+
+        public ShapeGeometry(List<Vector3> shapeVertice_, List<List<Vector3>> holes_, Option options = null) {
+            this.addShape(shapeVertice_, holes_, options);
+        }
+
+        public ShapeGeometry(List<Vector2> shapeVertice_, List<List<Vector2>> holes_, Option options = null) {
+            // convert 2D to 3D
+            List<Vector3> shapeVertice3d = new List<Vector3>();
+            foreach(var v in shapeVertice_) {
+                shapeVertice3d.Add(new Vector3(v.x, v.y, 0));
+            }
+
+            List<List<Vector3>> holes3dList = new List<List<Vector3>>();
+            for (int i = 0; i < holes_.Count; i++) {
+                List<Vector2> hole = holes_[i]; // org
+                List<Vector3> holes3d = new List<Vector3>();
+                for (int n = 0; n < hole.Count; n++) {
+                    Vector2 v2 = hole[n]; // org
+                    holes3d.Add(new Vector3(v2.x, v2.y, 0));
+                }
+                holes3dList.Add(holes3d);
+            }
+
+            this.addShape(shapeVertice3d, holes3dList, options);
         }
 
         /**
@@ -55,80 +69,85 @@ namespace THREE
 			return this;
 		}
 
-		/**
-		 * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
-		 */
-		void addShape(Shape shape, Option options ) {
+        /**
+         * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
+         */
+        void addShape(Shape shape, Option options) {
 
-            int curveSegments = shape.curveSegments;
-			
-			ExtrudeGeometry.IUVGenerator uvgen = options.uvGenerator;
-			if(uvgen == null){
-				uvgen = new ExtrudeGeometry.WorldUVGenerator();
-			}
+            shape.extractPoints();
 
-			//BoundingBox shapebb = this.shapebb;
-			int i, l;
+            List<Vector3> shapeVertices = shape.shapeVertices;
+            List<List<Vector3>> holes = shape.holesList;
+
+            this.addShape(shapeVertices, holes, options);
+        }
+
+        void addShape(List<Vector3> shapeVertices, List<List<Vector3>> holes, Option options = null) {
+            IUVGenerator uvgen = null;
+            if (options != null) {
+                uvgen = options.uvGenerator;
+            }
+            if (uvgen == null) {
+                uvgen = new WorldUVGenerator();
+            }
 
             int shapesOffset = this.vertices.Count;
-			shape.extractPoints();
-			
-			List<Vector3> shapeVertices = shape.shapeVertices;
-			List<List<Vector3>> holes = shape.holesList;
-			
-			bool reverse = !Shape.UtilsShape.isClockWise( shapeVertices );
-			
-			if ( reverse ) {
-				//vertices = vertices.reverse();
-				shapeVertices.Reverse();
-				
-				// Maybe we should also check if holes are in the opposite direction, just to be safe...
-				for ( i = 0, l = holes.Count; i < l; i++ ) {
-					
-					List<Vector3> hole = holes[ i ];
-					
-					if ( Shape.UtilsShape.isClockWise( hole ) ) {
-						//holes[ i ] = hole.reverse();
-						hole.Reverse();
-						holes[ i ] = hole;
-					}
-				}
-				reverse = false;
-			}
-			
-			List<List<int>> faces = Shape.UtilsShape.triangulateShape( shapeVertices, holes );
+            
+            bool reverse = !Shape.UtilsShape.isClockWise(shapeVertices);
 
-			// Vertices
-			//var contour = vertices;
-			for ( i = 0, l = holes.Count; i < l; i++ ) {
-				List<Vector3> hole = holes[ i ];
-				//vertices = vertices.concat( hole );
-				shapeVertices.AddRange(hole);
-			}
+            int i, l;
+            if (reverse) {
+                //vertices = vertices.reverse();
+                shapeVertices.Reverse();
 
-			Vector3 vert;
-			int vlen = shapeVertices.Count;
-			List<int> face;
-			int flen = faces.Count;
+                // Maybe we should also check if holes are in the opposite direction, just to be safe...
+                for (i = 0, l = holes.Count; i < l; i++) {
 
-			//var cont;
-			//int clen = contour.Count;
-			for ( i = 0; i < vlen; i++ ) {
-				vert = shapeVertices[ i ];
-				this.vertices.Add( new Vector3( vert.x, vert.y, 0 ) );
-			}
+                    List<Vector3> hole = holes[i];
 
-			for ( i = 0; i < flen; i++ ) {
-				face = faces[ i ];
+                    if (Shape.UtilsShape.isClockWise(hole)) {
+                        //holes[ i ] = hole.reverse();
+                        hole.Reverse();
+                        holes[i] = hole;
+                    }
+                }
+                reverse = false;
+            }
 
-				int a = face[0] + shapesOffset;
-				int b = face[1] + shapesOffset;
-				int c = face[2] + shapesOffset;
+            List<int[]> faces = Shape.UtilsShape.triangulateShape(shapeVertices, holes);
 
-				Face3 f = new Face3( a, b, c );
-				f.uvs = uvgen.generateBottomUV( this, shape, a, b, c );
-				this.faces.Add(f);
-			}
-		}
+            // Vertices
+            //var contour = vertices;
+            for (i = 0, l = holes.Count; i < l; i++) {
+                List<Vector3> hole = holes[i];
+                //vertices = vertices.concat( hole );
+                shapeVertices.AddRange(hole);
+            }
+
+            Vector3 vert;
+            int vlen = shapeVertices.Count;
+            int[] face;
+            int flen = faces.Count;
+
+            //var cont;
+            //int clen = contour.Count;
+            for (i = 0; i < vlen; i++) {
+                vert = shapeVertices[i];
+                this.vertices.Add(new Vector3(vert.x, vert.y, 0));
+            }
+
+            for (i = 0; i < flen; i++) {
+                face = faces[i];
+
+                int a = face[0] + shapesOffset;
+                int b = face[1] + shapesOffset;
+                int c = face[2] + shapesOffset;
+
+                Face3 f = new Face3(a, b, c);
+                f.uvs = uvgen.generateBottomUV(this, shapeVertices, a, b, c);
+                this.faces.Add(f);
+            }
+        }
+
 	}
 }

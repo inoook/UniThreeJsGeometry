@@ -25,9 +25,11 @@ namespace THREE
 
 	public class Bend : Curve { }
 
+    /// <summary>
+    /// Curve path. Curve や Bend の組み合わせで形状を作成する。
+    /// </summary>
 	public class CurvePath : Curve
 	{
-
 		public List<Curve> curves;
 		public List<Bend> bends;
 	
@@ -107,14 +109,9 @@ namespace THREE
 			// loop where sum != 0, sum > d , sum+1 <d
 		}
 
-		/*
-		THREE.CurvePath.prototype.getTangent = function( t ) {
-		};*/
-	
 		// We cannot use the default THREE.Curve getPoint() with getLength() because in
 		// THREE.Curve, getLength() depends on getPoint() but in THREE.CurvePath
 		// getPoint() depends on getLength
-	
 		public override float getLength ()
 		{
 			List<float> lens = this.getCurveLengths ();
@@ -127,13 +124,10 @@ namespace THREE
 
 		List<float> getCurveLengths ()
 		{
-		
 			// We use cache values if curves and cache array are same length
 			if (this.cacheLengths != null && this.cacheLengths.Count == this.curves.Count) { // TODO: CHECK/////////
 				return this.cacheLengths;
 			}
-			;
-		
 			// Get length of subsurve
 			// Push sums into cached array
 		
@@ -155,7 +149,6 @@ namespace THREE
 		// Returns min and max coordinates
 		public BoundingBox getBoundingBox ()
 		{
-		
 			List<Vector3> points = this.getPoints ();
 		
 			float maxX, maxY, maxZ;
@@ -253,15 +246,12 @@ namespace THREE
 	
 		Geometry createGeometry (List<Vector3> points)
 		{
-		
 			Geometry geometry = new Geometry ();
 		
 			for (int i = 0; i < points.Count; i ++) {
 				geometry.vertices.Add (new Vector3 (points [i].x, points [i].y, points [i].z));
 			}
-		
 			return geometry;
-		
 		}
 
 

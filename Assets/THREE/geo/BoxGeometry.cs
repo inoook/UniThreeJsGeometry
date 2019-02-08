@@ -37,7 +37,6 @@ namespace THREE
 			
 			//this.computeCentroids();
 			this.mergeVertices();
-			
 		}
 		
 		void buildPlane (string u, string v, int udir, int vdir, float width, float height, float depth, int materialIndex)

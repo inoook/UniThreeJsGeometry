@@ -15,8 +15,13 @@ using System.Collections.Generic;
 
 namespace THREE
 {
-
-	public class Shape : Path
+    // Shape -> Path -> CurvePath -> Curve
+    /// <summary>
+    /// Shape. 
+    /// 形状を元に extractPoints() をすることで、描画するための形状 (shapeVertices, holesList) を算出する。
+    /// curveSegments で描画の精度をコントロール。
+    /// </summary>
+    public class Shape : Path
 	{
 		public List<CurvePath> holes;
         public List<Vector2> normals;
@@ -27,49 +32,6 @@ namespace THREE
         public int curveSegments = 12; // カーブの再現の細かさ
 
         public bool reverse;
-
-        public static Shape Combine(Shape s0, Shape s1)
-        {
-            // TODO: メッシュの重なりで問題がある。使用非推奨。
-            s0.pointList.AddRange(s1.pointList);
-            s0.actions.AddRange(s1.actions);
-            
-            s0.extractPoints();
-            s1.extractPoints();
-
-            s0.shapeVertices.AddRange(s1.shapeVertices);
-            s0.holesList.AddRange(s1.holesList);
-
-            Shape shape = new Shape();
-            shape.shapeVertices = s0.shapeVertices;
-            shape.holesList = s0.holesList;
-            //
-            List<Vector3> ahole;
-            List<Vector3> shapeVertices = shape.shapeVertices;
-            List<List<Vector3>> holes = shape.holesList;
-
-            bool reverse = !Shape.UtilsShape.isClockWise(shapeVertices);
-            if (reverse)
-            {
-                shapeVertices.Reverse();
-
-                for (int h = 0; h < holes.Count; h++)
-                {
-                    ahole = holes[h];
-
-                    if (Shape.UtilsShape.isClockWise(ahole))
-                    {
-                        ahole.Reverse();
-                        holes[h] = ahole;
-                    }
-                }
-            }
-
-            shape.holesList = holes;
-            shape.reverse = reverse;
-
-            return shape;
-        }
 
         public Shape (List<Vector2> points, List<Vector2> normals = null) : base( points )
 		{
@@ -176,10 +138,9 @@ namespace THREE
 		 **************************************************************/
 		public class UtilsShape
 		{
-			public static List<List<int>> triangulateShape (List<Vector3> contour, List<List<Vector3>> holes)
+			public static List<int[]> triangulateShape (List<Vector3> contour, List<List<Vector3>> holes)
 			{
 				//int i, il, f; 
-				//List<int> face;
 				string key; 
 				int index;
 
@@ -199,7 +160,6 @@ namespace THREE
 				}
 
 				// prepare all points map
-
 				for (int i = 0, il = allpoints.Count; i < il; i ++) {
 				
 					key = allpoints [i].x + ":" + allpoints [i].y;
@@ -215,18 +175,16 @@ namespace THREE
 				// remove holes by cutting paths to holes and adding them to the shape
 				List<Vector3> shapeWithoutHoles = removeHoles (contour, holes);
 
-				List<List<Vector3>> triangles = THREE.FontUtils.Triangulate (shapeWithoutHoles, false); // True returns indices for points of spooled shape
-				//Debug.Log ("triangles: " + triangles.Count);
+				List<List<Vector2>> triangles = FontUtils.Triangulate (shapeWithoutHoles, false); // True returns indices for points of spooled shape
 
 				// check all face vertices against all points map
-			
-				List<List<int>> resultIndexes = new List<List<int>> ();
+				List<int[]> resultIndexes = new List<int[]> ();
 
 				for (int i = 0, il = triangles.Count; i < il; i ++) {
 				
-					List<Vector3> face = triangles [i];
+					List<Vector2> face = triangles [i];
 
-					List<int> indexs = new List<int> (new int[3]);
+					int[] indexs = new int[3];
 
 					for (int f = 0; f < 3; f ++) {
 						key = face [f].x + ":" + face [f].y;

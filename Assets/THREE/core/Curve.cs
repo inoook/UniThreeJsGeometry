@@ -78,7 +78,6 @@ namespace THREE
 		}
 
 		// Get sequence of points using getPointAt( u )
-
 		public virtual List<Vector3> getSpacedPoints (float divisions = 5, bool closedPath = false)
 		{
 			List<Vector3> pts = new List<Vector3> ();
@@ -93,7 +92,6 @@ namespace THREE
 
 		public virtual float getLength ()
 		{
-		
 			List<float> lengths = this.getLengths ();
 			return lengths [lengths.Count - 1];	
 		}

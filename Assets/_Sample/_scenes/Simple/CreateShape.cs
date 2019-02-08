@@ -21,8 +21,7 @@ public class CreateShape : CreateBase {
         //dmyShape.curveSegments = 18;
         ////dmyShape.moveTo(0, 0);
         ////dmyShape.ellipse(-20, 0, 20, 10, 0, Mathf.PI * 2, true);
-
-
+        
         ////dmyShape.moveTo(60, 0);
         //dmyShape.absarc(-50, 50, 20, 0, Mathf.PI * 2, true);
 

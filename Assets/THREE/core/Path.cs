@@ -33,9 +33,12 @@ namespace THREE
 		}
 	}
 
-	public class Path : CurvePath
+    // Path -> CurvePath -> Curve
+    /// <summary>
+    /// Path. moveTo, lineTo, arc など描画系の関数を持つ
+    /// </summary>
+    public class Path : CurvePath
 	{
-
 		public List<PAction> actions;
 		public List<Vector2> pointList;
 		public bool useSpacedPoints = false;
@@ -143,9 +146,7 @@ namespace THREE
 			}));
 			this.actions.Add (act);
 		}
-
-		// FUTURE: Change the API or follow canvas API?
-	
+        
 		public void arc (float aX, float aY, float aRadius, float aStartAngle, float aEndAngle, bool aClockwise)
 		{
 		
@@ -258,7 +259,7 @@ namespace THREE
 				
 				case PathActions.LINE_TO:
 					THREE.Utils.DebugLog ("LINE_TO");
-					points.Add (new Vector2 (args [0], args [1]));
+					points.Add (new Vector3(args [0], args [1]));
 				
 					break;
 				
@@ -294,7 +295,7 @@ namespace THREE
 						tx = Shape.UtilsShape.b2 (t, cpx0, cpx1, cpx);
 						ty = Shape.UtilsShape.b2 (t, cpy0, cpy1, cpy);
 					
-						points.Add (new Vector3 (tx, ty));
+						points.Add (new Vector3(tx, ty));
 					}
 					break;
 
@@ -333,7 +334,7 @@ namespace THREE
 						tx = Shape.UtilsShape.b3 (t, cpx0, cpx1, cpx2, cpx);
 						ty = Shape.UtilsShape.b3 (t, cpy0, cpy1, cpy2, cpy);
 					
-						points.Add (new Vector2 (tx, ty));
+						points.Add (new Vector3 (tx, ty));
 						
 					}
 					break;
@@ -390,7 +391,7 @@ namespace THREE
 					
 						//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 					
-						points.Add (new Vector2 (tx, ty));
+						points.Add (new Vector3(tx, ty));
 					
 					}
 				

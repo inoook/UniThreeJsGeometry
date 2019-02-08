@@ -29,14 +29,14 @@ namespace THREE
 	{
 		static float EPSILON = Setting.EPSILON;
 		
-		public static List<List<Vector3>> Triangulate (List<Vector3> contour, bool indices)
+		public static List<List<Vector2>> Triangulate (List<Vector3> contour, bool indices)
 		{
 			int n = contour.Count;
 
 			if (n < 3)
 				return null;
 
-			List<List<Vector3>> result = new List<List<Vector3>> ();
+			List<List<Vector2>> result = new List<List<Vector2>> ();
 			List<int> verts = new List<int> ();
 			List<List<int>> vertIndices = new List<List<int>>();
 
@@ -119,7 +119,7 @@ namespace THREE
 					
 					/* output Triangle */
 					
-					result.Add (new List<Vector3> (new Vector3[]{ 
+					result.Add (new List<Vector2> (new Vector2[]{ 
 						contour [a],
 					    contour [b],
 						contour [c] }));

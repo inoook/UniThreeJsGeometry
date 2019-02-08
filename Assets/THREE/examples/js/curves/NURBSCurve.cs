@@ -38,7 +38,7 @@ namespace THREE {
 			float u = this.knots[0] + t * (this.knots[this.knots.Length - 1] - this.knots[0]); // linear mapping t->u
 			
 			// following results in (wx, wy, wz, w) homogeneous point
-			Vector4 hpoint = THREE.NURBSUtils.calcBSplinePoint(this.degree, this.knots, this.controlPoints, u);
+			Vector4 hpoint = NURBSUtils.calcBSplinePoint(this.degree, this.knots, this.controlPoints, u);
 			
 			if (hpoint.w != 1.0f) { // project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
 				//hpoint.divideScalar(hpoint.w);
@@ -52,7 +52,7 @@ namespace THREE {
 		public override Vector3 getTangent (float t)
 		{
 			float u = this.knots[0] + t * (this.knots[this.knots.Length - 1] - this.knots[0]);
-			Vector4[] ders = THREE.NURBSUtils.calcNURBSDerivatives(this.degree, this.knots, this.controlPoints, u, 1);
+			Vector4[] ders = NURBSUtils.calcNURBSDerivatives(this.degree, this.knots, this.controlPoints, u, 1);
 			
 			Vector3 tangent = ders[1];
 			tangent.Normalize();

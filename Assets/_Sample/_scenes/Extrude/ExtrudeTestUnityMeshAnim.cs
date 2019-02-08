@@ -56,7 +56,7 @@ public class ExtrudeTestUnityMeshAnim : MonoBehaviour {
         extrudeSettings.bevelEnabled = false;
 		extrudeSettings.extrudePath = randomSpline;
 		extrudeSettings.frames = new FrenetFrames(randomSpline, step, false);
-        extrudeSettings.uvGenerator = new ExtrudeGeometry.UVGenerator(40, 40);
+        extrudeSettings.uvGenerator = new UVGenerator(40, 40);
 
         // update shape
         extrudeGeo = new ExtrudeGeometry( startShape, extrudeSettings );

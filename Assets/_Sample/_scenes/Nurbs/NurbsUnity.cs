@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+using THREE;
+
 // http://threejs.org/examples/#webgl_geometry_nurbs
 public class NurbsUnity : MonoBehaviour
 {
@@ -37,8 +39,8 @@ public class NurbsUnity : MonoBehaviour
 			
 		}
 
-		THREE.NURBSCurve nurbsCurve = new THREE.NURBSCurve(nurbsDegree, nurbsKnots.ToArray(), nurbsControlPoints.ToArray());
-		THREE.Geometry nurbsGeometry = new THREE.Geometry();
+		NURBSCurve nurbsCurve = new NURBSCurve(nurbsDegree, nurbsKnots.ToArray(), nurbsControlPoints.ToArray());
+		Geometry nurbsGeometry = new Geometry();
 		List<Vector3> pts = nurbsCurve.getPoints(200);
 
 		nurbsGeometry.vertices = pts;
@@ -80,7 +82,7 @@ public class NurbsUnity : MonoBehaviour
 		float[] knots2 = new float[]{ 0, 0, 0, 0, 1, 1, 1, 1 };
 		nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
 		
-		THREE.ParametricGeometry geometry = new THREE.ParametricGeometry(getSurfacePoint, 20, 20);
+		ParametricGeometry geometry = new ParametricGeometry(getSurfacePoint, 20, 20);
 		AddRenderObject(geometry, material, Vector3.zero);
 		
 		t_nsControlPoints = nsControlPoints;
@@ -101,14 +103,14 @@ public class NurbsUnity : MonoBehaviour
 	}
 
 
-	THREE.NURBSSurface nurbsSurface;
+	NURBSSurface nurbsSurface;
 
 	Vector3 getSurfacePoint(float u, float v)
 	{
 		return nurbsSurface.getPoint(u, v);
 	}
 
-	THREE.Geometry AddRenderObject(THREE.Geometry geo, Material material, Vector3 position)
+	Geometry AddRenderObject(Geometry geo, Material material, Vector3 position)
 	{
 		UnityEngine.Mesh mesh = geo.GetMesh();
 		
@@ -125,7 +127,8 @@ public class NurbsUnity : MonoBehaviour
 		
 		return geo;
 	}
-	THREE.Geometry AddRenderLineObject(THREE.Geometry geo, Material material, Vector3 position)
+
+	Geometry AddRenderLineObject(THREE.Geometry geo, Material material, Vector3 position)
 	{
 		UnityEngine.Mesh mesh = geo.GetLineMesh();
 		

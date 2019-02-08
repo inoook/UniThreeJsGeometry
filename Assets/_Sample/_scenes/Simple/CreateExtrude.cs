@@ -32,7 +32,7 @@ public class CreateExtrude : CreateBase {
         extrudeSettings.thicknessCurve = thicknessCurve;
         //extrudeSettings.bevelEnabled = true;
 
-        extrudeSettings.uvGenerator = new ExtrudeGeometry.UVGenerator(80, 80);
+        extrudeSettings.uvGenerator = new UVGenerator(80, 80);
         //extrudeSettings.uvGenerator = new UVsUtils.CylinderUVGenerator();
 
         //Shape startShape = ShapeUtils.CreateStar(star_innerSize, star_outerSize, star_NumPts);

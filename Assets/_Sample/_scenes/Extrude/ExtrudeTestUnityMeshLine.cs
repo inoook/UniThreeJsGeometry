@@ -71,9 +71,9 @@ public class ExtrudeTestUnityMeshLine : MonoBehaviour {
 		AddRenderObject(testGeometry, material, Vector3.zero);
 	}
 
-	Geometry AddRenderObject(Geometry geo, Material material, Vector3 position, float smooth = 0.0f) // 60
+	Geometry AddRenderObject(Geometry geo, Material material, Vector3 position)
 	{
-		UnityEngine.Mesh mesh = geo.GetMesh(smooth);
+		UnityEngine.Mesh mesh = geo.GetMesh();
 
 		GameObject gObj = new GameObject();
 		gObj.transform.SetParent(this.transform);

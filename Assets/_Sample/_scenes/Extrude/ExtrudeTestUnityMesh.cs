@@ -40,7 +40,7 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		extrudeSettings.steps = 30; // 30, 100
 		extrudeSettings.bevelEnabled = false;
 		extrudeSettings.extrudePath	= closedSpline;
-        extrudeSettings.uvGenerator = new ExtrudeGeometry.UVGenerator();
+        extrudeSettings.uvGenerator = new UVGenerator();
         //extrudeSettings.curveSegments = 4;
 
         List<Vector2> pts = new List<Vector2>();
@@ -109,7 +109,7 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		extrude1Settings.bevelSegments = 1;
 
 		testGeometry = new ExtrudeGeometry( startShape, extrude1Settings );
-		AddRenderObject(testGeometry, materials[2], new Vector3(50, 100, 50 ), 0.0f);
+		AddRenderObject(testGeometry, materials[2], new Vector3(50, 100, 50 ));
 
 		// test
 		Geometry startShapeGeo;
@@ -117,9 +117,9 @@ public class ExtrudeTestUnityMesh : MonoBehaviour {
 		AddRenderObject(startShapeGeo, materials[0], Vector3.zero);
 	}
 
-	Geometry AddRenderObject(Geometry geo, Material material, Vector3 position, float smooth = 0.0f)
+	Geometry AddRenderObject(Geometry geo, Material material, Vector3 position)
 	{
-		UnityEngine.Mesh mesh = geo.GetMesh(smooth);
+		UnityEngine.Mesh mesh = geo.GetMesh();
 
 		GameObject gObj = new GameObject();
 		gObj.transform.SetParent(this.transform);
